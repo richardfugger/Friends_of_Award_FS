@@ -1,0 +1,130 @@
+﻿body {
+    font-family: Arial;
+}
+
+
+.title-main {
+    text-align: center;
+    font-weight: bold;
+    font-size: 2.4rem;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+}
+
+.instructions {
+    text-align: center;
+    font-weight: bold;
+    line-height: 1.4;
+}
+
+.note-text {
+    text-align: center;
+    color: #555;
+    margin-top: 10px;
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 110px);
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.number-button {
+    background-color: #e5e5e5;
+    border: none;
+    padding: 15px 0;
+    font-size: 1.3rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .number-button:hover {
+        background-color: #d6d6d6;
+    }
+
+    .number-button.favorite {
+        background-color: #4caf50; /* grün */
+        color: white;
+        font-weight: bold;
+    }
+
+    .number-button.topfavorite {
+        background-color: #ffa726; /* orange */
+        color: white;
+        font-weight: bold;
+    }
+
+.status {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.submit-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 25px;
+}
+
+.submit-button {
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    padding: 12px 35px;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+    .submit-button:hover {
+        background-color: #1e88e5;
+    }
+
+/* Admin-Panel oben wie im 2. Bild */
+.admin-panel {
+    max-width: 900px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    padding: 15px 20px;
+}
+
+.admin-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.admin-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    .admin-row label {
+        min-width: 90px;
+    }
+
+/* Haus-Button unten rechts */
+.home-button {
+    position: fixed;
+    bottom: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 26px;
+    line-height: 1;
+    padding: 0;
+}

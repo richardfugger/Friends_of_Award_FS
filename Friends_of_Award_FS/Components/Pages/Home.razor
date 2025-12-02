@@ -7,7 +7,6 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
 
 <AuthorizeView>
     <Authorized>
@@ -30,6 +29,74 @@
 </AuthorizeView>
 
 
+<h1 class="title-main">Friends of Award</h1>
+
+<p class="subtitle">
+    Geben Sie uns Ihre persönlichen Favoriten bekannt!
+</p>
+
+<p class="instructions">
+    Einfacher Klick = Favorit (max. 5)<br />
+    Doppelklick = Topfavorit (max. 1)
+</p>
+
+<p class="note-text">
+    Diese Abstimmung ist anonym und auf ein Gerät beschränkt!
+</p>
+
+
+<div class="button-grid">
+    @foreach (var item in Items)
+    {
+        <button class="number-button @(GetButtonClass(item))"
+                @onclick="() => ClickButton(item)"
+                @ondblclick="() => DoubleClickButton(item)">
+            @GetStars(item) @item
+        </button>
+    }
+</div>
+
+<p class="status">
+    Offen: @RemainingFavorites Favoriten, @RemainingTop Topfavorit
+</p>
+
+
+<div class="submit-container">
+    <button class="submit-button">
+        Bewertung absenden
+    </button>
+</div>
+
+
+@* ADMINBEREICH – wird nur angezeigt, wenn showAdmin == true *@
+@if (showAdmin)
+{
+    <div class="admin-panel">
+        <h2 class="admin-title">Adminbereich</h2>
+
+        <div class="admin-row">
+            <label for="adminCode">Admin-Code:</label>
+            <input id="adminCode" type="password" @bind="adminCode" />
+
+            <button @onclick="OnLogin">Anmelden</button>
+            <button @onclick="OnLogout">Abmelden</button>
+        </div>
+    </div>
+}
+
+@* HAUS-ICON UNTEN RECHTS *@
+<button class="home-button" @onclick="ToggleAdmin">
+    🏠
+</button>
+
+
+
+
+<style>
+    body {
+        font-family: Arial;
+    }
+</style>
 
 
 
@@ -46,4 +113,90 @@
         else
             Console.WriteLine("Fatal Error: AuthProvider == null!!");
     }
+
+    //EMIL
+    // 👉 HIER legst du fest, wie viele Buttons es gibt:
+    // Beispiel: 1–20
+    public List<int> Items { get; set; } = Enumerable.Range(1, 20).ToList();
+
+    // Oder 1–12:
+    // public List<int> Items { get; set; } = Enumerable.Range(1, 12).ToList();
+
+    // Oder 100 Stück:
+    // public List<int> Items { get; set; } = Enumerable.Range(1, 100).ToList();
+
+    private int MaxFavorites = 5;
+
+    private HashSet<int> favorites = new();
+    private int? topfavorite = null;
+
+    private int RemainingFavorites => MaxFavorites - favorites.Count;
+    private int RemainingTop => topfavorite == null ? 1 : 0;
+
+    private bool IsFavorite(int n) => favorites.Contains(n);
+    private bool IsTopFavorite(int n) => topfavorite == n;
+
+    private string GetButtonClass(int n)
+        => IsTopFavorite(n) ? "topfavorite"
+         : IsFavorite(n) ? "favorite"
+         : "";
+
+    private string GetStars(int n)
+        => IsTopFavorite(n) ? "⭐⭐ "
+         : IsFavorite(n) ? "⭐ "
+         : "";
+
+    // --- Klick ---
+    private void ClickButton(int n)
+    {
+        if (IsTopFavorite(n))
+            return;
+
+        if (IsFavorite(n))
+        {
+            favorites.Remove(n);
+            return;
+        }
+
+        if (favorites.Count >= MaxFavorites)
+            return;
+
+        favorites.Add(n);
+    }
+
+    // --- Doppelklick ---
+    private void DoubleClickButton(int n)
+    {
+        if (IsTopFavorite(n))
+        {
+            topfavorite = null;
+            return;
+        }
+
+        topfavorite = n;
+        favorites.Remove(n);
+    }
+
+
+
+    private bool showAdmin = false;
+    private string adminCode = string.Empty;
+
+    private void ToggleAdmin()
+    {
+        showAdmin = !showAdmin;   // klick = ein/ausblenden
+    }
+
+    private void OnLogin()
+    {
+        // Hier später deine Login-Logik
+        Console.WriteLine($"Login mit Code: {adminCode}");
+    }
+
+    private void OnLogout()
+    {
+        adminCode = string.Empty;
+        // Hier später deine Logout-Logik
+    }
+
 }
