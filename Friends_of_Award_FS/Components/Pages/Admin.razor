@@ -1,19 +1,53 @@
 ﻿@page "/admin"
 @rendermode InteractiveServer
-
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
 @* SPAA: für Authorization*@
 @using Microsoft.AspNetCore.Components.Authorization
 
 <PageTitle>Admin</PageTitle>
+<h3>Admin Login</h3>
 
-<AuthorizeView>
-	<Authorized>
-		<h1>Admin</h1>
-		<NavLink href="/"> Zurück zu Home </NavLink>
-	</Authorized>
+<div>
+    <input @bind="email" placeholder="E-Mail" />
+</div>
 
-	<NotAuthorized>
-		<h3 style="color: red">Sie sind nicht berechtigt, diese Seite zu sehen.</h3>
-		<NavLink href="/"> Zurück zu Home </NavLink>
-	</NotAuthorized>
-</AuthorizeView>
+<div style="margin-top:10px">
+    <input @bind="password" type="password" placeholder="Passwort" class="form-control" />
+</div>
+
+<div style="margin-top:10px">
+    <button @onclick="Btn_Login">Login</button>
+</div>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+
+
+@code{
+    private string email;
+    private string password;
+    private string error = "";
+
+
+    private void Btn_Login()
+    {
+        // Beispiel-Admin-Daten
+        string adminEmail = "admin@example.com";
+        string adminPass = "1234";
+
+        if (email == adminEmail && password == adminPass)
+        {
+            // await((CustomAuthStateProvider)AuthStateProvider)
+            //     .SignInUserAsync(email, "Admin");
+
+            Nav.NavigateTo("/admin");
+        }
+        else
+        {
+            error = "Login fehlgeschlagen. E-Mail oder Passwort falsch.";
+        }
+    }
+}
