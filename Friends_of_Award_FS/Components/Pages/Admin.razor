@@ -1,0 +1,19 @@
+﻿@page "/admin"
+@rendermode InteractiveServer
+
+@* SPAA: für Authorization*@
+@using Microsoft.AspNetCore.Components.Authorization
+
+<PageTitle>Admin</PageTitle>
+
+<AuthorizeView>
+	<Authorized>
+		<h1>Admin</h1>
+		<NavLink href="/"> Zurück zu Home </NavLink>
+	</Authorized>
+
+	<NotAuthorized>
+		<h3 style="color: red">Sie sind nicht berechtigt, diese Seite zu sehen.</h3>
+		<NavLink href="/"> Zurück zu Home </NavLink>
+	</NotAuthorized>
+</AuthorizeView>
