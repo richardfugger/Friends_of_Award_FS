@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="Friends_of_Award_FS/Friends_of_Award_FS.csproj" />
+  <Project Path="Friends_of_Award_FS_Lib/Friends_of_Award_FS_Lib.csproj" />
 </Solution>

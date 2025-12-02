@@ -1,53 +1,39 @@
 ﻿@page "/admin"
-@rendermode InteractiveServer
+@using Blazor_WithAuth_ForSWP5
 @inject NavigationManager Nav
-@inject AuthenticationStateProvider AuthStateProvider
-@* SPAA: für Authorization*@
+@inject MyCustomAuthStateProvider? AuthStateProvider
 @using Microsoft.AspNetCore.Components.Authorization
 
-<PageTitle>Admin</PageTitle>
-<h3>Admin Login</h3>
+<h3>🔐 Admin Bereich</h3>
 
-<div>
-    <input @bind="email" placeholder="E-Mail" />
-</div>
+<p>Willkommen im Admin-Bereich, @username!</p>
 
-<div style="margin-top:10px">
-    <input @bind="password" type="password" placeholder="Passwort" class="form-control" />
-</div>
+<button @onclick="Logout">
+    Logout
+</button>
 
-<div style="margin-top:10px">
-    <button @onclick="Btn_Login">Login</button>
-</div>
+@code {
+    private string? username;
 
-@if (!string.IsNullOrEmpty(error))
-{
-    <p style="color:red">@error</p>
-}
-
-
-@code{
-    private string email;
-    private string password;
-    private string error = "";
-
-
-    private void Btn_Login()
+    protected override async Task OnInitializedAsync()
     {
-        // Beispiel-Admin-Daten
-        string adminEmail = "admin@example.com";
-        string adminPass = "1234";
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
 
-        if (email == adminEmail && password == adminPass)
+        // Unberechtigter Aufruf der ADmin-Page abfangen
+        if (!user.Identity?.IsAuthenticated ?? false ||
+            !user.IsInRole("Admin"))
         {
-            // await((CustomAuthStateProvider)AuthStateProvider)
-            //     .SignInUserAsync(email, "Admin");
+            Nav.NavigateTo("/adminlogin");
+            return;
+        }
 
-            Nav.NavigateTo("/admin");
-        }
-        else
-        {
-            error = "Login fehlgeschlagen. E-Mail oder Passwort falsch.";
-        }
+        username = user.Identity?.Name;
+    }
+
+    private async Task Logout()
+    {
+        await AuthStateProvider.LogoutAsync();
+        Nav.NavigateTo("/");
     }
 }

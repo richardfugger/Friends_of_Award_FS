@@ -7,7 +7,6 @@ namespace Blazor_WithAuth_ForSWP5
 	public class MyCustomAuthStateProvider : AuthenticationStateProvider
 	{
 		private ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
-		// _anonymous - falls _currentUser null ist
 		private ClaimsPrincipal? _currentUser = null;
 
 
@@ -17,20 +16,39 @@ namespace Blazor_WithAuth_ForSWP5
 		}
 
 
-		public void Login(string username)
-		{
-			ClaimsIdentity identity = new([new Claim(ClaimTypes.Name, username)],
-					"MyCustomAuthType");  // von SPAA erfunden, keiner der Standardtypen
+        /// <summary>
+        /// Login mit Benutzername und Rolle
+        /// </summary>
+        public Task LoginAsync(string username, string role)
+        {
+            // Claims erstellen (Name + Rolle)
+            var claims = new List<Claim>()
+            {
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.Role, role)   // WICHTIG: Admin/User
+            };
 
-			_currentUser = new ClaimsPrincipal(identity);
-			NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-		}
+            var identity = new ClaimsIdentity(
+                claims,
+                authenticationType: "MyCustomAuthType"
+            );
 
+            _currentUser = new ClaimsPrincipal(identity);
 
-		public void Logout()
-		{
-			_currentUser = null;
-			NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
-		}
-	}
+            // Benachrichtige Blazor, dass sich der Auth-State geändert hat
+            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Logout setzt den User auf "anonymous"
+        /// </summary>
+        public Task LogoutAsync()
+        {
+            _currentUser = null;
+            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+            return Task.CompletedTask;
+        }
+    }
 }

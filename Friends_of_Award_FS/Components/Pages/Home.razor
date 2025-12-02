@@ -11,21 +11,26 @@
 
 <AuthorizeView>
     <Authorized>
-        @{
-            // ja, man kann hier direkt C#-Code einfügen
-            string name = "unknown";
-            if (context.User.Identity != null)
-                name = $"{context.User.Identity.Name}";
-        }
-        <h3>Willkommen, @name</h3>
+        @if (context.User.IsInRole("Admin"))
+        {
+            <h3>Willkommen Admin, @context.User.Identity?.Name</h3>
 
-        <NavLink href="/Admin">Zur Admin-Page</NavLink> <br />
-        <button @onclick="Btn_Logout">Logout</button>
+            <NavLink href="/admin">Zur Admin-Seite</NavLink> <br />
+            <button @onclick="Logout">Logout</button>
+        }
+        else
+        {
+            <h3>Willkommen, @context.User.Identity?.Name</h3>
+            <p>Sie sind als normaler Benutzer eingeloggt.</p>
+            <button @onclick="Logout">Logout</button>
+        }
     </Authorized>
 
     <NotAuthorized>
-        <h3 style="color: red">Sie sind nicht eingeloggt.</h3>
-        <button @onclick="Btn_Login">Login</button>
+        <h3 style="color:red">Sie sind nicht eingeloggt.</h3>
+        <button @onclick="@(() => MyNavMgr.NavigateTo("/adminlogin"))">
+            Admin Login
+        </button>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -33,17 +38,11 @@
 
 
 
-@code {
-    void Btn_Login()
-    {
-        MyNavMgr.NavigateTo("/Login");
-    }
 
-    void Btn_Logout()
+@code {
+    private async Task Logout()
     {
-        if (MyAuthStateProvider != null)
-            MyAuthStateProvider.Logout();
-        else
-            Console.WriteLine("Fatal Error: AuthProvider == null!!");
+        await ((MyCustomAuthStateProvider)MyAuthStateProvider).LogoutAsync();
+        MyNavMgr.NavigateTo("/");
     }
 }

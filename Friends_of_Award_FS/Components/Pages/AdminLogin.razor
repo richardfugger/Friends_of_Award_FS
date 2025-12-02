@@ -1,0 +1,53 @@
+﻿@page "/adminlogin"
+@rendermode InteractiveServer
+@inject NavigationManager Nav
+@inject MyCustomAuthStateProvider? MyAuthStateProvider
+@using Microsoft.AspNetCore.Components.Authorization
+@using Blazor_WithAuth_ForSWP5
+
+<PageTitle>AdminLogin</PageTitle>
+<h3>Admin Login</h3>
+
+<div>
+    <input @bind="email" placeholder="E-Mail" />
+</div>
+
+<div style="margin-top:10px">
+    <input @bind="password" type="password" placeholder="Passwort" class="form-control" />
+</div>
+
+<div style="margin-top:10px">
+    <button @onclick="Btn_Login">Login</button>
+</div>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+
+
+@code{
+    private string email;
+    private string password;
+    private string error = "";
+
+
+    private async Task Btn_Login()
+    {
+        // Beispiel Daten
+        string adminEmail = "admin@example.com";
+        string adminPass = "1234";
+
+        if (email == adminEmail && password == adminPass)
+        {
+            await((MyCustomAuthStateProvider)MyAuthStateProvider)
+                .LoginAsync(email, "Admin");
+
+            Nav.NavigateTo("/admin");
+        }
+        else
+        {
+            error = "Login fehlgeschlagen. E-Mail oder Passwort falsch.";
+        }
+    }
+}
