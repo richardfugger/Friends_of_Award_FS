@@ -3,17 +3,29 @@
 @inject NavigationManager Nav
 @inject MyCustomAuthStateProvider? AuthStateProvider
 @using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Cryptography
 
 <h3>🔐 Admin Bereich</h3>
 
 <p>Willkommen im Admin-Bereich, @username!</p>
+
+<form>
+<p>
+    <input @bind="qrCodeCount" placeholder="Anzahl der zu generierenden QR-Codes" />
+</p>
+<p>
+        <button @onclick="Btn_GenerateQrCodes">Generate</button>
+</p>
+</form>
+
 
 <button @onclick="Logout">
     Logout
 </button>
 
 @code {
-    private string? username;
+    private string? username = "";
+    private int qrCodeCount = -1;
 
     protected override async Task OnInitializedAsync()
     {
@@ -21,15 +33,23 @@
         var user = authState.User;
 
         // Unberechtigter Aufruf der ADmin-Page abfangen
-        if (!user.Identity?.IsAuthenticated ?? false ||
-            !user.IsInRole("Admin"))
-        {
-            Nav.NavigateTo("/adminlogin");
-            return;
-        }
+        // Funktioniert noch nicht
+        // if (!user.Identity?.IsAuthenticated ?? false ||
+        //     !user.IsInRole("Admin"))
+        // {
+        //     Nav.NavigateTo("/adminlogin");
+        //     return;
+        // }
 
-        username = user.Identity?.Name;
+        // username = user.Identity?.Name;
     }
+
+
+    private void Btn_GenerateQrCodes()
+    {
+        // QR Codes Generieren
+    }
+
 
     private async Task Logout()
     {

@@ -9,28 +9,25 @@
 
 <h1>Hello, world!</h1>
 
-<AuthorizeView>
+<AuthorizeView Context="auth">
     <Authorized>
-        @if (context.User.IsInRole("Admin"))
+        @if (auth.User.IsInRole("Admin"))
         {
-            <h3>Willkommen Admin, @context.User.Identity?.Name</h3>
+            <h3>Willkommen Admin, @auth.User.Identity?.Name</h3>
 
             <NavLink href="/admin">Zur Admin-Seite</NavLink> <br />
             <button @onclick="Logout">Logout</button>
         }
         else
         {
-            <h3>Willkommen, @context.User.Identity?.Name</h3>
+            <h3>Willkommen, @auth.User.Identity?.Name</h3>
             <p>Sie sind als normaler Benutzer eingeloggt.</p>
             <button @onclick="Logout">Logout</button>
         }
     </Authorized>
 
     <NotAuthorized>
-        <h3 style="color:red">Sie sind nicht eingeloggt.</h3>
-        <button @onclick="@(() => MyNavMgr.NavigateTo("/adminlogin"))">
-            Admin Login
-        </button>
+        <p>Weiterleitung...</p>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -40,6 +37,21 @@
 
 
 @code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
+            var user = state.User;
+
+            if (!user.Identity.IsAuthenticated)
+            {
+                MyNavMgr.NavigateTo("/adminlogin", true);
+            }
+        }
+    }
+
     private async Task Logout()
     {
         await ((MyCustomAuthStateProvider)MyAuthStateProvider).LogoutAsync();

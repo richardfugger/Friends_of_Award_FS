@@ -25,7 +25,7 @@ namespace Blazor_WithAuth_ForSWP5
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.Role, role)   // WICHTIG: Admin/User
+                new Claim(ClaimTypes.Role, role) // Admin / User
             };
 
             var identity = new ClaimsIdentity(
@@ -35,7 +35,6 @@ namespace Blazor_WithAuth_ForSWP5
 
             _currentUser = new ClaimsPrincipal(identity);
 
-            // Benachrichtige Blazor, dass sich der Auth-State geändert hat
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
 
             return Task.CompletedTask;

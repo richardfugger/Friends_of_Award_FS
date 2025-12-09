@@ -2,8 +2,10 @@
 @rendermode InteractiveServer
 @inject NavigationManager Nav
 @inject MyCustomAuthStateProvider? MyAuthStateProvider
+@using Friends_of_Award_FS_Lib
 @using Microsoft.AspNetCore.Components.Authorization
 @using Blazor_WithAuth_ForSWP5
+@using System.Security.Cryptography
 
 <PageTitle>AdminLogin</PageTitle>
 <h3>Admin Login</h3>
@@ -34,11 +36,18 @@
 
     private async Task Btn_Login()
     {
-        // Beispiel Daten
-        string adminEmail = "admin@example.com";
-        string adminPass = "1234";
+        bool isAdmin = false;
 
-        if (email == adminEmail && password == adminPass)
+        if(string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            error = "Email und Passwort muss ausgefüllt sein!";
+            return;
+        }
+
+        Admin admin = new(email, password);
+        isAdmin = admin.CheckAdminLoginData();
+
+        if (isAdmin)
         {
             await((MyCustomAuthStateProvider)MyAuthStateProvider)
                 .LoginAsync(email, "Admin");
