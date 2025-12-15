@@ -8,7 +8,7 @@
 @using System.Security.Cryptography
 @using QRCoder
 
-<AuthorizeView>
+@* <AuthorizeView>
     <Authorized>
         @{
             // ja, man kann hier direkt C#-Code einfügen
@@ -24,15 +24,44 @@
             <p><button @onclick="Btn_GenerateQrCodes">Generate</button></p>
         </form>
 
+        @if (generatedQrCodes.Count > 0)
+        {
+            <h4>Generierte QR-Codes</h4>
+
+            @foreach (var qr in generatedQrCodes)
+            {
+                <img src="data:image/png;base64,@Convert.ToBase64String(qr)"
+                     style="margin:10px; width:200px;" />
+            }
+        }
+
         <button @onclick="Logout">Logout</button>
     </Authorized>
 
     <NotAuthorized>
         <p>Weiterleitung...</p>
     </NotAuthorized>
-</AuthorizeView>
+</AuthorizeView> *@
 
 
+<h3>🔐 Admin Bereich</h3>
+<p>Willkommen im Admin-Bereich, @username!</p>
+
+<form>
+    <p><input @bind="qrCodeCount" placeholder="Anzahl der zu generierenden QR-Codes" /></p>
+    <button type="button" @onclick="Btn_GenerateQrCodes">Generate</button>
+</form>
+
+@* @if (generatedQrCodes.Count > 0)
+{
+    <h4>Generierte QR-Codes</h4>
+
+    @foreach (var qr in generatedQrCodes)
+    {
+        <img src="data:image/png;base64,@Convert.ToBase64String(qr)"
+             style="margin:10px; width:200px;" />
+    }
+} *@
 
 
 
@@ -40,30 +69,37 @@
 @code {
     private string? username = "";
     private int qrCodeCount = -1;
-
+    private List<byte[]> generatedQrCodes = new();
 
 
     private void Btn_GenerateQrCodes()
     {
-        // QR Codes Generieren
+        generatedQrCodes.Clear();
+
+        if (qrCodeCount <= 0)
+            return;
+
         for (int i = 0; i < qrCodeCount; i++)
         {
-            string token = TokenGenerator.GenerateToken();
+            string token = Token.GenerateToken();
 
-            // z. B. QR-Code in eine URL einbetten
-            string qrValue = $"https://myapp/login?token={token}";
+            // Token in DB speichern
+            bool saved = Token.SaveTokenToDatabase(token);
+            if (!saved)
+                continue;
+
+            string baseUrl = Nav.BaseUri.TrimEnd('/');
+            string qrValue = $"{baseUrl}/qr-login?token={token}";
 
             using var qrGenerator = new QRCodeGenerator();
             var qrData = qrGenerator.CreateQrCode(qrValue, QRCodeGenerator.ECCLevel.Q);
             var qrCode = new PngByteQRCode(qrData);
-            byte[] qrImage = qrCode.GetGraphic(8);
 
-            // Diese Bytes kannst du speichern oder anzeigen.
-            // SaveQrCodeToDisk(qrImage, $"qr_{i}.png");
+            byte[] qrImage = qrCode.GetGraphic(3);
 
-            // // Token/Hash in DB speichern
-            // SaveTokenToDatabase(token);
+            generatedQrCodes.Add(qrImage);
         }
+        StateHasChanged();
     }
 
 

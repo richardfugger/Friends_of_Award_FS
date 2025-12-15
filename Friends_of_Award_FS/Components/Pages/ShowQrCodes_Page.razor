@@ -1,0 +1,61 @@
+﻿<h3>ShowQrCodes_Page</h3>
+
+
+@page "/anmeldung"
+@rendermode InteractiveServer
+@inject NavigationManager Nav
+@using Friends_of_Award_FS_Lib
+@using QRCoder
+
+<h3>Anmeldung</h3>
+
+@if (qrImageBase64 != null)
+{
+    <img src="data:image/png;base64,@qrImageBase64"
+         style="width:300px" />
+
+    <br />
+    <br />
+    <button @onclick="Next">Nächster Code</button>
+}
+else
+{
+    <p>Keine weiteren QR-Codes verfügbar.</p>
+}
+
+@code {
+    private string? currentToken;
+    private string? qrImageBase64;
+
+    protected override void OnInitialized()
+    {
+        LoadNextQr();
+    }
+
+    private void LoadNextQr()
+    {
+        currentToken = Token.GenerateToken();
+
+        if (currentToken == null)
+        {
+            qrImageBase64 = null;
+            return;
+        }
+
+        string url = $"{Nav.BaseUri.TrimEnd('/')}/qr-login?token={currentToken}";
+
+        using var gen = new QRCodeGenerator();
+        var data = gen.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+        var qr = new PngByteQRCode(data);
+
+        qrImageBase64 = Convert.ToBase64String(qr.GetGraphic(4));
+    }
+
+    private void Next()
+    {
+        if (currentToken != null)
+            //Token.MarkAsUsed(currentToken);
+
+        LoadNextQr();
+    }
+}

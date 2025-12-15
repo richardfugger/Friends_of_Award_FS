@@ -33,19 +33,19 @@ namespace Friends_of_Award_FS_Lib
 
         private static bool CheckTokenUniqueness(string hexString)
         {
-            bool tokenExists = false;
+            bool tokenIsUnique = true;
             DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
             DataTable dt;
 
             try
             {
-                string sql = $"SELECT token FROM foausers";
+                string sql = $"SELECT token FROM foa_qr_tokens";
                 dt = wrappr.RunQuery(sql);
                 foreach (DataRow dr in dt.Rows)
                 {
                     if (hexString == dr[0].ToString())
                     {
-                        tokenExists = true;
+                        tokenIsUnique = false;
                         break;
                     }
                 }
@@ -53,10 +53,10 @@ namespace Friends_of_Award_FS_Lib
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                tokenExists = false;
+                tokenIsUnique = false;
             }
 
-            return tokenExists;
+            return tokenIsUnique;
         }
 
         public static bool SaveTokenToDatabase(string token)
@@ -66,7 +66,7 @@ namespace Friends_of_Award_FS_Lib
 
             try
             {
-                string sql = $"INSERT INTO foausers (token) VALUES ('{token}')";
+                string sql = $"INSERT INTO foa_qr_tokens (token) VALUES ('{token}')";
 
                 int numRows = wrappr.RunNonQuery(sql);
                 if (numRows != 1) success = false;
