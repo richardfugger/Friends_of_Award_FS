@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="QRCoder" Version="1.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Friends_of_Award_FS_Lib\Friends_of_Award_FS_Lib.csproj" />
   </ItemGroup>
 

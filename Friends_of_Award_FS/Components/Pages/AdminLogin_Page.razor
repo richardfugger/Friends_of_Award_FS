@@ -34,7 +34,7 @@
     private string error = "";
 
 
-    private async Task Btn_Login()
+    private void Btn_Login()
     {
         bool isAdmin = false;
 
@@ -49,11 +49,12 @@
 
         if (isAdmin)
         {
-            await((MyCustomAuthStateProvider)MyAuthStateProvider)
-                .LoginAsync(email, "Admin");
+            MyAuthStateProvider.Login(email);
+			Nav.NavigateTo("/admin");
 
-            Nav.NavigateTo("/admin");
+            Nav.NavigateTo("/admin", forceLoad: true);
         }
+
         else
         {
             error = "Login fehlgeschlagen. E-Mail oder Passwort falsch.";

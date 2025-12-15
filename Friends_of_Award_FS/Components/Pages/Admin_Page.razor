@@ -1,59 +1,75 @@
 ﻿@page "/admin"
+@rendermode InteractiveServer
 @using Blazor_WithAuth_ForSWP5
 @inject NavigationManager Nav
 @inject MyCustomAuthStateProvider? AuthStateProvider
+@using Friends_of_Award_FS_Lib
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Cryptography
+@using QRCoder
 
-<h3>🔐 Admin Bereich</h3>
+<AuthorizeView>
+    <Authorized>
+        @{
+            // ja, man kann hier direkt C#-Code einfügen
+            string name = "unknown";
+            if (context.User.Identity != null)
+                name = $"{context.User.Identity.Name}";
+        }
+        <h3>🔐 Admin Bereich</h3>
+        <p>Willkommen im Admin-Bereich, @name!</p>
 
-<p>Willkommen im Admin-Bereich, @username!</p>
+        <form>
+            <p><input @bind="qrCodeCount" placeholder="Anzahl der zu generierenden QR-Codes" /></p>
+            <p><button @onclick="Btn_GenerateQrCodes">Generate</button></p>
+        </form>
 
-<form>
-<p>
-    <input @bind="qrCodeCount" placeholder="Anzahl der zu generierenden QR-Codes" />
-</p>
-<p>
-        <button @onclick="Btn_GenerateQrCodes">Generate</button>
-</p>
-</form>
+        <button @onclick="Logout">Logout</button>
+    </Authorized>
+
+    <NotAuthorized>
+        <p>Weiterleitung...</p>
+    </NotAuthorized>
+</AuthorizeView>
 
 
-<button @onclick="Logout">
-    Logout
-</button>
+
+
+
 
 @code {
     private string? username = "";
     private int qrCodeCount = -1;
 
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-
-        // Unberechtigter Aufruf der ADmin-Page abfangen
-        // Funktioniert noch nicht
-        // if (!user.Identity?.IsAuthenticated ?? false ||
-        //     !user.IsInRole("Admin"))
-        // {
-        //     Nav.NavigateTo("/adminlogin");
-        //     return;
-        // }
-
-        // username = user.Identity?.Name;
-    }
 
 
     private void Btn_GenerateQrCodes()
     {
         // QR Codes Generieren
+        for (int i = 0; i < qrCodeCount; i++)
+        {
+            string token = TokenGenerator.GenerateToken();
+
+            // z. B. QR-Code in eine URL einbetten
+            string qrValue = $"https://myapp/login?token={token}";
+
+            using var qrGenerator = new QRCodeGenerator();
+            var qrData = qrGenerator.CreateQrCode(qrValue, QRCodeGenerator.ECCLevel.Q);
+            var qrCode = new PngByteQRCode(qrData);
+            byte[] qrImage = qrCode.GetGraphic(8);
+
+            // Diese Bytes kannst du speichern oder anzeigen.
+            // SaveQrCodeToDisk(qrImage, $"qr_{i}.png");
+
+            // // Token/Hash in DB speichern
+            // SaveTokenToDatabase(token);
+        }
     }
 
 
-    private async Task Logout()
+    private void Logout()
     {
-        await AuthStateProvider.LogoutAsync();
+        AuthStateProvider.Logout();
         Nav.NavigateTo("/");
     }
 }
