@@ -1,0 +1,48 @@
+﻿@page "/qr-login"
+@rendermode InteractiveServer
+@using Blazor_WithAuth_ForSWP5
+@using Friends_of_Award_FS_Lib
+@inject NavigationManager MyNavMgr
+@inject MyCustomAuthStateProvider? MyAuthStateProvider
+
+<h3>QrCode_Login_Page</h3>
+
+@if (!string.IsNullOrEmpty(error))
+{
+    <p style="color:red">@error</p>
+}
+
+
+
+@code {
+    private string? token;
+    private string? error = "";
+    private bool tokenIsInvalid = true;
+
+    protected override void OnInitialized()
+    {
+        var uri = MyNavMgr.ToAbsoluteUri(MyNavMgr.Uri);
+
+        if (Microsoft.AspNetCore.WebUtilities.QueryHelpers
+            .ParseQuery(uri.Query)
+            .TryGetValue("token", out var tokenValue))
+        {
+            token = tokenValue;
+            tokenIsInvalid = Token.CheckTokenUniqueness(token);
+
+            if(tokenIsInvalid)
+            {
+                error = "Token is not valid.";
+            }
+            else
+            {
+                MyAuthStateProvider.Login(token);
+                MyNavMgr.NavigateTo("/");
+            }
+        }
+        else
+        {
+            error = "No Token found.";
+        }
+    }
+}

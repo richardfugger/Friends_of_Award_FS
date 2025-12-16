@@ -32,7 +32,7 @@ namespace Friends_of_Award_FS_Lib
             return hexString;
         }
 
-        private static bool CheckTokenUniqueness(string hexString)
+        public static bool CheckTokenUniqueness(string hexString)
         {
             bool tokenIsUnique = true;
             DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
@@ -130,5 +130,6 @@ namespace Friends_of_Award_FS_Lib
 
             return success;
         }
+
     }
 }
