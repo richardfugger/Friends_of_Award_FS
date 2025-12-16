@@ -116,7 +116,7 @@ namespace Friends_of_Award_FS_Lib
 
             try
             {
-                string sql = "UPDATE foa_qr_tokens SET used = 1 WHERE token = @token";
+                string sql = $"UPDATE foa_qr_tokens SET used = 1 WHERE token = '{token}'";
 
                 int numRows = wrappr.RunNonQuery(sql);
                 if (numRows != 1) success = false;

@@ -20,12 +20,18 @@
         {
             <p class="no-codes">Keine weiteren QR-Codes verfügbar.</p>
         }
+
+        @if(!string.IsNullOrWhiteSpace(errormessage))
+        {
+            <p class="error">@errormessage</p>
+        }
     </div>
 </div>
 
 @code {
     private List<string> unusedTokenList = new();
     private string? qrImageBase64;
+    private string errormessage = "";
 
     protected override void OnInitialized()
     {
@@ -58,7 +64,12 @@
         {
             Token.MarkAsUsed(unusedTokenList[^1]);
             unusedTokenList.RemoveAt(unusedTokenList.Count - 1);
+            LoadNextQr();
         }
-        LoadNextQr();
+        else
+        {
+            errormessage = "No more QR-Codes availiable.";
+        }
+
     }
 }

@@ -1,7 +1,7 @@
 ﻿@page "/admin"
 @rendermode InteractiveServer
 @using Blazor_WithAuth_ForSWP5
-@inject NavigationManager Nav
+@inject NavigationManager MyNavMgr
 @inject MyCustomAuthStateProvider? MyAuthStateProvider
 @using Friends_of_Award_FS_Lib
 @using Microsoft.AspNetCore.Components.Authorization
@@ -50,26 +50,6 @@
 </AuthorizeView>
 
 
-@* <h3>🔐 Admin Bereich</h3>
-<p>Willkommen im Admin-Bereich, @username!</p>
-
-<form>
-    <p><input @bind="qrCodeCount" placeholder="Anzahl der zu generierenden QR-Codes" /></p>
-    <button type="button" @onclick="Btn_GenerateQrCodes">Generate</button>
-</form>
-
-@if (generatedQrCodes.Count > 0)
-{
-    <h4>Generierte QR-Codes</h4>
-
-    @foreach (var qr in generatedQrCodes)
-    {
-        <img src="data:image/png;base64,@Convert.ToBase64String(qr)"
-             style="margin:10px; width:200px;" />
-    }
-} *@
-
-
 
 
 @code {
@@ -94,7 +74,7 @@
             if (!saved)
                 continue;
 
-            string baseUrl = Nav.BaseUri.TrimEnd('/');
+            string baseUrl = MyNavMgr.BaseUri.TrimEnd('/');
             string qrValue = $"{baseUrl}/qr-login?token={token}";
 
             using var qrGenerator = new QRCodeGenerator();
@@ -112,6 +92,20 @@
     private void Logout()
     {
         MyAuthStateProvider.Logout();
-        Nav.NavigateTo("/");
+        MyNavMgr.NavigateTo("/");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
+            var user = state.User;
+
+            if (!user.Identity.IsAuthenticated)
+            {
+                MyNavMgr.NavigateTo("/adminlogin", true);
+            }
+        }
     }
 }
