@@ -1,0 +1,94 @@
+﻿/* Gesamter Seitenhintergrund */
+.login-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Login Card */
+.login-card {
+    background: rgba(255, 255, 255, 0.97);
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+    border-radius: 16px;
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+    /* Titel */
+    .login-card h3 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 26px;
+        font-weight: 600;
+        color: #222;
+    }
+
+    /* Inputs */
+    .login-card input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 13px 14px;
+        margin-bottom: 16px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 15px;
+        transition: all 0.2s ease;
+    }
+
+        /* Input Focus */
+        .login-card input:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 2px rgba(42, 82, 152, 0.2);
+        }
+
+    /* Login Button */
+    .login-card button {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 13px;
+        margin-top: 8px;
+        border-radius: 8px;
+        border: none;
+        background: linear-gradient(135deg, #2a5298, #1e3c72);
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+        /* Button Hover */
+        .login-card button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(30, 60, 114, 0.4);
+        }
+
+/* Fehlertext */
+.error {
+    margin-top: 15px;
+    text-align: center;
+    color: #d32f2f;
+    font-size: 14px;
+}
+
+/* Fade-In Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

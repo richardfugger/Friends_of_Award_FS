@@ -1,0 +1,64 @@
+﻿@page "/qrcodes"
+@rendermode InteractiveServer
+@inject NavigationManager Nav
+@using Friends_of_Award_FS_Lib
+@using QRCoder
+
+<div class="qr-wrapper">
+    <div class="qr-card">
+        <h3>Anmeldung</h3>
+
+        @if (qrImageBase64 != null)
+        {
+            <img @key="qrImageBase64"
+                 src="data:image/png;base64,@qrImageBase64"
+                 class="qr-image" />
+
+            <button @onclick="Next">Nächster Code</button>
+        }
+        else
+        {
+            <p class="no-codes">Keine weiteren QR-Codes verfügbar.</p>
+        }
+    </div>
+</div>
+
+@code {
+    private List<string> unusedTokenList = new();
+    private string? qrImageBase64;
+
+    protected override void OnInitialized()
+    {
+        unusedTokenList = Token.LoadTokenFromDb();
+        LoadNextQr();
+    }
+
+    private void LoadNextQr()
+    {
+        if (unusedTokenList.Count == 0)
+        {
+            qrImageBase64 = null;
+            return;
+        }
+
+        string url = $"{Nav.BaseUri.TrimEnd('/')}/qr-login?token={unusedTokenList[^1]}";
+
+        using var gen = new QRCodeGenerator();
+        var data = gen.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+        var qr = new PngByteQRCode(data);
+
+        qrImageBase64 = Convert.ToBase64String(qr.GetGraphic(4));
+
+
+    }
+
+    private void Next()
+    {
+        if (unusedTokenList.Count != 0)
+        {
+            Token.MarkAsUsed(unusedTokenList[^1]);
+            unusedTokenList.RemoveAt(unusedTokenList.Count - 1);
+        }
+        LoadNextQr();
+    }
+}

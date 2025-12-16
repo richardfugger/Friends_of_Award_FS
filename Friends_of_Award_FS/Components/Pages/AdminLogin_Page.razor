@@ -8,24 +8,22 @@
 @using System.Security.Cryptography
 
 <PageTitle>AdminLogin</PageTitle>
-<h3>Admin Login</h3>
+<div class="login-wrapper">
+    <div class="login-card">
+        <h3>Admin Login</h3>
 
-<div>
-    <input @bind="email" placeholder="E-Mail" />
+        <input @bind="email" placeholder="E-Mail" />
+
+        <input @bind="password" type="password" placeholder="Passwort" />
+
+        <button @onclick="Btn_Login">Login</button>
+
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <p class="error">@error</p>
+        }
+    </div>
 </div>
-
-<div style="margin-top:10px">
-    <input @bind="password" type="password" placeholder="Passwort" class="form-control" />
-</div>
-
-<div style="margin-top:10px">
-    <button @onclick="Btn_Login">Login</button>
-</div>
-
-@if (!string.IsNullOrEmpty(error))
-{
-    <p style="color:red">@error</p>
-}
 
 
 @code{

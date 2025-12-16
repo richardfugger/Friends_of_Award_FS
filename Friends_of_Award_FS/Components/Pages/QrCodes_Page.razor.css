@@ -1,0 +1,113 @@
+﻿/* ===========================
+   Seitenhintergrund
+   =========================== */
+.qr-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ===========================
+   Card Container
+   =========================== */
+.qr-card {
+    background: rgba(255, 255, 255, 0.97);
+    padding: 40px;
+    width: 100%;
+    max-width: 460px;
+    border-radius: 18px;
+    box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+    /* ===========================
+   Titel
+   =========================== */
+    .qr-card h3 {
+        margin-bottom: 25px;
+        font-size: 26px;
+        font-weight: 600;
+        color: #222;
+    }
+
+/* ===========================
+   QR-Code Bild
+   =========================== */
+.qr-image {
+    width: 260px;
+    height: 260px;
+    padding: 15px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    margin-bottom: 25px;
+    animation: qrFadeIn 0.35s ease;
+}
+
+/* ===========================
+   Button
+   =========================== */
+.qr-card button {
+    width: 100%;
+    max-width: 260px;
+    padding: 13px;
+    border-radius: 8px;
+    border: none;
+    background: linear-gradient(135deg, #2a5298, #1e3c72);
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+    .qr-card button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 20px rgba(30, 60, 114, 0.4);
+    }
+
+/* ===========================
+   Keine Codes Text
+   =========================== */
+.no-codes {
+    font-size: 15px;
+    color: #555;
+    margin-top: 20px;
+}
+
+/* ===========================
+   Animationen
+   =========================== */
+
+/* Seiten-Fade-In */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* QR-Code Wechsel Animation */
+@keyframes qrFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

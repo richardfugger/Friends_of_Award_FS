@@ -2,13 +2,13 @@
 @rendermode InteractiveServer
 @using Blazor_WithAuth_ForSWP5
 @inject NavigationManager Nav
-@inject MyCustomAuthStateProvider? AuthStateProvider
+@inject MyCustomAuthStateProvider? MyAuthStateProvider
 @using Friends_of_Award_FS_Lib
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Cryptography
 @using QRCoder
 
-@* <AuthorizeView>
+<AuthorizeView>
     <Authorized>
         @{
             // ja, man kann hier direkt C#-Code einfügen
@@ -20,8 +20,14 @@
         <p>Willkommen im Admin-Bereich, @name!</p>
 
         <form>
-            <p><input @bind="qrCodeCount" placeholder="Anzahl der zu generierenden QR-Codes" /></p>
-            <p><button @onclick="Btn_GenerateQrCodes">Generate</button></p>
+            <p>
+                <input type="number" @bind="qrCodeCount" />
+            </p>
+            <p>
+                <button type="button" @onclick="Btn_GenerateQrCodes">
+                    Generate
+                </button>
+            </p>
         </form>
 
         @if (generatedQrCodes.Count > 0)
@@ -41,10 +47,10 @@
     <NotAuthorized>
         <p>Weiterleitung...</p>
     </NotAuthorized>
-</AuthorizeView> *@
+</AuthorizeView>
 
 
-<h3>🔐 Admin Bereich</h3>
+@* <h3>🔐 Admin Bereich</h3>
 <p>Willkommen im Admin-Bereich, @username!</p>
 
 <form>
@@ -52,7 +58,7 @@
     <button type="button" @onclick="Btn_GenerateQrCodes">Generate</button>
 </form>
 
-@* @if (generatedQrCodes.Count > 0)
+@if (generatedQrCodes.Count > 0)
 {
     <h4>Generierte QR-Codes</h4>
 
@@ -105,7 +111,7 @@
 
     private void Logout()
     {
-        AuthStateProvider.Logout();
+        MyAuthStateProvider.Logout();
         Nav.NavigateTo("/");
     }
 }
