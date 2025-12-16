@@ -92,3 +92,10 @@
         transform: translateY(0);
     }
 }
+
+.message {
+    margin-top: 15px;
+    text-align: center;
+    color: #d32f2f;
+    font-size: 14px;
+}

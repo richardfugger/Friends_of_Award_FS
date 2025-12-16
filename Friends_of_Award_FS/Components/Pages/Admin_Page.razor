@@ -16,32 +16,38 @@
             if (context.User.Identity != null)
                 name = $"{context.User.Identity.Name}";
         }
-        <h3>🔐 Admin Bereich</h3>
-        <p>Willkommen im Admin-Bereich, @name!</p>
+        <div class="admin-wrapper">
+            <div class="admin-card">
+                <h3>🔐 Admin Bereich</h3>
+                <p class="welcome">
+                    Willkommen im Admin-Bereich, <strong>@name</strong>!
+                </p>
 
-        <form>
-            <p>
-                <input type="number" @bind="qrCodeCount" />
-            </p>
-            <p>
-                <button type="button" @onclick="Btn_GenerateQrCodes">
-                    Generate
+                <form class="admin-form">
+                    <label>
+                        Anzahl QR-Codes
+                        <input type="number" @bind="qrCodeCount" />
+                    </label>
+
+                    <button type="button" @onclick="Btn_GenerateQrCodes">
+                        Generate
+                    </button>
+                </form>
+
+                @if(!string.IsNullOrWhiteSpace(message))
+                {
+                    <p class="message">@message</p>
+                }
+
+                <button type="button" @onclick="Btn_NavToQrCodes">
+                    View QR-Codes
                 </button>
-            </p>
-        </form>
 
-        @if (generatedQrCodes.Count > 0)
-        {
-            <h4>Generierte QR-Codes</h4>
-
-            @foreach (var qr in generatedQrCodes)
-            {
-                <img src="data:image/png;base64,@Convert.ToBase64String(qr)"
-                     style="margin:10px; width:200px;" />
-            }
-        }
-
-        <button @onclick="Logout">Logout</button>
+                <button class="logout-btn" @onclick="Logout">
+                    Logout
+                </button>
+            </div>
+        </div>
     </Authorized>
 
     <NotAuthorized>
@@ -54,14 +60,13 @@
 
 @code {
     private string? username = "";
-    private int qrCodeCount = -1;
-    private List<byte[]> generatedQrCodes = new();
+    private int qrCodeCount = 0;
+    private string message = "";
+    int errorCount = 0;
 
 
     private void Btn_GenerateQrCodes()
     {
-        generatedQrCodes.Clear();
-
         if (qrCodeCount <= 0)
             return;
 
@@ -72,22 +77,22 @@
             // Token in DB speichern
             bool saved = Token.SaveTokenToDatabase(token);
             if (!saved)
+            {
+                errorCount++;
+                message = $"{errorCount}/{qrCodeCount} QR-Code Generations failed.";
                 continue;
-
-            string baseUrl = MyNavMgr.BaseUri.TrimEnd('/');
-            string qrValue = $"{baseUrl}/qr-login?token={token}";
-
-            using var qrGenerator = new QRCodeGenerator();
-            var qrData = qrGenerator.CreateQrCode(qrValue, QRCodeGenerator.ECCLevel.Q);
-            var qrCode = new PngByteQRCode(qrData);
-
-            byte[] qrImage = qrCode.GetGraphic(3);
-
-            generatedQrCodes.Add(qrImage);
+            }
         }
-        StateHasChanged();
+        if(errorCount == 0)
+        {
+            message = $"{qrCodeCount} QR-Codes have been generated";
+        }
     }
 
+    private void Btn_NavToQrCodes()
+    {
+        MyNavMgr.NavigateTo("/qrcodes");
+    }
 
     private void Logout()
     {
