@@ -1,6 +1,6 @@
 ﻿@page "/adminlogin"
 @rendermode InteractiveServer
-@inject NavigationManager Nav
+@inject NavigationManager MyNavMgr
 @inject MyCustomAuthStateProvider? MyAuthStateProvider
 @using Friends_of_Award_FS_Lib
 @using Microsoft.AspNetCore.Components.Authorization
@@ -48,7 +48,7 @@
         if (isAdmin)
         {
             MyAuthStateProvider.Login(email);
-			Nav.NavigateTo("/admin");
+			MyNavMgr.NavigateTo("/admin");
         }
 
         else
