@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -32,32 +33,28 @@ namespace Friends_of_Award_FS_Lib
             return hexString;
         }
 
-        public static bool CheckTokenUniqueness(string hexString)
+        public static bool CheckTokenUniqueness(string token)
         {
-            bool tokenIsUnique = true;
             DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
-            DataTable dt;
 
             try
             {
-                string sql = $"SELECT token FROM foa_qr_tokens";
-                dt = wrappr.RunQuery(sql);
-                foreach (DataRow dr in dt.Rows)
-                {
-                    if (hexString == dr[0].ToString())
-                    {
-                        tokenIsUnique = false;
-                        break;
-                    }
-                }
+                token = MySqlHelper.EscapeString(token);
+
+                string sql = $"""
+            SELECT COUNT(*) 
+            FROM foa_qr_tokens 
+            WHERE token = '{token}'
+        """;
+
+                var result = wrappr.RunQueryScalar(sql);
+                return Convert.ToInt32(result) == 0;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                tokenIsUnique = false;
+                return false;
             }
-
-            return tokenIsUnique;
         }
 
         public static bool SaveTokenToDatabase(string token)
@@ -131,5 +128,43 @@ namespace Friends_of_Award_FS_Lib
             return success;
         }
 
+        public static bool IsValidUnusedToken(string token)
+        {
+            DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
+
+            string sql = $"""
+        SELECT COUNT(*) 
+        FROM foa_qr_tokens 
+        WHERE token = '{token}'
+    """;
+
+            var result = wrappr.RunQueryScalar(sql);
+
+            Console.WriteLine($"[TOKEN CHECK] token={token}, exists={result}");
+
+            return Convert.ToInt32(result) == 1;
+        }
+
+        public static bool MarkAsVoted(string token)
+        {
+            bool success = false;
+            DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
+
+            try
+            {
+                string sql = $"UPDATE foa_qr_tokens SET voted = 1 WHERE token = '{token}'";
+
+                int numRows = wrappr.RunNonQuery(sql);
+                if (numRows != 1) success = false;
+                else success = true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                success = false;
+            }
+
+            return success;
+        }
     }
 }

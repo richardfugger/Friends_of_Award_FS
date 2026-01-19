@@ -10,6 +10,7 @@
 <AuthorizeView>
     <Authorized>
         <h3>Willkommen</h3>
+        
     </Authorized>
 
     <NotAuthorized>
@@ -195,21 +196,22 @@
 
         var uri = MyNavMgr.ToAbsoluteUri(MyNavMgr.Uri);
 
-        // 🔹 1. Token aus Query lesen
-        if (Microsoft.AspNetCore.WebUtilities.QueryHelpers
-            .ParseQuery(uri.Query)
+        Console.WriteLine($"[HOME] URL: {uri}");
+        Console.WriteLine($"[HOME] HasToken: {uri.Query.Contains("token")}");
+
+        // 🔴 WICHTIG: Wenn Token vorhanden → Home greift NICHT ein
+        if (Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query)
             .TryGetValue("token", out var tokenValue))
         {
-            // Token muss noch mitgegeben werden
             MyNavMgr.NavigateTo($"/qr-login?token={tokenValue}");
             return;
         }
 
-        // 🔹 2. Normaler Auth-Check
+        // 🔹 Nur normaler Auth-Check OHNE Token
         var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
         var user = state.User;
 
-        if (!user.Identity.IsAuthenticated)
+        if (!user.Identity!.IsAuthenticated)
         {
             MyNavMgr.NavigateTo("/adminlogin", true);
         }

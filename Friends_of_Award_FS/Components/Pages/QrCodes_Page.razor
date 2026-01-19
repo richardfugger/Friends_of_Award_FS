@@ -50,19 +50,20 @@
 
         string url = $"{Nav.BaseUri.TrimEnd('/')}/qr-login?token={unusedTokenList[^1]}";
 
+        Console.WriteLine($"[QRCODE]: {url}");
+        Console.WriteLine($"[QRCODE] Showing token: {unusedTokenList[^1]}");
+
         using var gen = new QRCodeGenerator();
         var data = gen.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
         var qr = new PngByteQRCode(data);
 
         qrImageBase64 = Convert.ToBase64String(qr.GetGraphic(4));
-
-
     }
 
     private void Next()
     {
         if (unusedTokenList.Count != 0)
-        {
+        {       
             Token.MarkAsUsed(unusedTokenList[^1]);
             unusedTokenList.RemoveAt(unusedTokenList.Count - 1);
             LoadNextQr();

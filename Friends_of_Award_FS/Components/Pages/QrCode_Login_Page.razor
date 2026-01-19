@@ -19,30 +19,37 @@
     private string? error = "";
     private bool tokenIsInvalid = true;
 
-    protected override void OnInitialized()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (!firstRender)
+            return;
+
         var uri = MyNavMgr.ToAbsoluteUri(MyNavMgr.Uri);
 
-        if (Microsoft.AspNetCore.WebUtilities.QueryHelpers
-            .ParseQuery(uri.Query)
-            .TryGetValue("token", out var tokenValue))
-        {
-            token = tokenValue;
-            tokenIsInvalid = Token.CheckTokenUniqueness(token);
+        Console.WriteLine($"[QR LOGIN] URL = {uri}");
+        
 
-            if(tokenIsInvalid)
-            {
-                error = "Token is not valid.";
-            }
-            else
-            {
-                MyAuthStateProvider.Login(token);
-                MyNavMgr.NavigateTo("/");
-            }
-        }
-        else
+        if (!Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query)
+            .TryGetValue("token", out var token))
         {
-            error = "No Token found.";
+            error = "No token found.";
+            Console.WriteLine($"[QR LOGIN] No token found");
+            StateHasChanged();
+            return;
         }
+
+        Console.WriteLine($"[QR LOGIN] Token received = {token}");
+        var valid = Token.IsValidUnusedToken(token);
+
+        if (!valid)
+        {
+            error = "Invalid token.";
+            StateHasChanged();
+            return;
+        }
+
+        MyAuthStateProvider.Login(token);
+        MyNavMgr.NavigateTo("/");
     }
+
 }
