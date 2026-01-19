@@ -9,20 +9,11 @@
 
 <AuthorizeView>
     <Authorized>
-        @{
-            string name = "unknown";
-            if (context.User.Identity != null)
-                name = $"{context.User.Identity.Name}";
-        }
-        <h3>Willkommen, @name</h3>
-
-        <NavLink href="/Admin">Zur Admin-Page</NavLink> <br />
-        <button @onclick="Btn_Logout">Logout</button>
+        <h3>Willkommen</h3>
     </Authorized>
 
     <NotAuthorized>
-        <h3 style="color: red">Sie sind nicht eingeloggt.</h3>
-        <button @onclick="Btn_Login">Login</button>
+        <p>Weiterleitung...</p>
     </NotAuthorized>
 </AuthorizeView>
 
@@ -195,10 +186,37 @@
     private void OnLogin()
     {
         Console.WriteLine($"Login mit Code: {adminCode}");
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        var uri = MyNavMgr.ToAbsoluteUri(MyNavMgr.Uri);
+
+        // 🔹 1. Token aus Query lesen
+        if (Microsoft.AspNetCore.WebUtilities.QueryHelpers
+            .ParseQuery(uri.Query)
+            .TryGetValue("token", out var tokenValue))
+        {
+            // Token muss noch mitgegeben werden
+            MyNavMgr.NavigateTo($"/qr-login?token={tokenValue}");
+            return;
+        }
+
+        // 🔹 2. Normaler Auth-Check
+        var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
+        var user = state.User;
+
+        if (!user.Identity.IsAuthenticated)
+        {
+            MyNavMgr.NavigateTo("/adminlogin", true);
+        }
     }
 
-    private void OnLogout()
+    private void Logout()
     {
-        adminCode = string.Empty;
+        ((MyCustomAuthStateProvider)MyAuthStateProvider).Logout();
+        MyNavMgr.NavigateTo("/");
     }
 }

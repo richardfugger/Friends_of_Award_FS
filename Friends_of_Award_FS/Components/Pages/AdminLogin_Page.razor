@@ -1,0 +1,59 @@
+﻿@page "/adminlogin"
+@rendermode InteractiveServer
+@inject NavigationManager MyNavMgr
+@inject MyCustomAuthStateProvider? MyAuthStateProvider
+@using Friends_of_Award_FS_Lib
+@using Microsoft.AspNetCore.Components.Authorization
+@using Blazor_WithAuth_ForSWP5
+@using System.Security.Cryptography
+
+<PageTitle>AdminLogin</PageTitle>
+<div class="login-wrapper">
+    <div class="login-card">
+        <h3>Admin Login</h3>
+
+        <input @bind="email" placeholder="E-Mail" />
+
+        <input @bind="password" type="password" placeholder="Passwort" />
+
+        <button @onclick="Btn_Login">Login</button>
+
+        @if (!string.IsNullOrEmpty(error))
+        {
+            <p class="error">@error</p>
+        }
+    </div>
+</div>
+
+
+@code{
+    private string email;
+    private string password;
+    private string error = "";
+
+
+    private void Btn_Login()
+    {
+        bool isAdmin = false;
+
+        if(string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            error = "Email und Passwort muss ausgefüllt sein!";
+            return;
+        }
+
+        Admin admin = new(email, password);
+        isAdmin = admin.CheckAdminLoginData();
+
+        if (isAdmin)
+        {
+            MyAuthStateProvider.Login(email);
+			MyNavMgr.NavigateTo("/admin");
+        }
+
+        else
+        {
+            error = "Login fehlgeschlagen. E-Mail oder Passwort falsch.";
+        }
+    }
+}
