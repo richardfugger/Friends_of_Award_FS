@@ -39,7 +39,7 @@
             .TryGetValue("token", out var tokenValue))
         {
             // Token muss noch mitgegeben werden
-            MyNavMgr.NavigateTo("/qr-login");
+            MyNavMgr.NavigateTo($"/qr-login?token={tokenValue}");
             return;
         }
 
@@ -52,7 +52,6 @@
             MyNavMgr.NavigateTo("/adminlogin", true);
         }
     }
-}
 
     private void Logout()
     {
