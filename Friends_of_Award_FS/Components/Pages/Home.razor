@@ -7,11 +7,9 @@
 
 <PageTitle>Home</PageTitle>
 
-
 <AuthorizeView>
     <Authorized>
         @{
-            // ja, man kann hier direkt C#-Code einfügen
             string name = "unknown";
             if (context.User.Identity != null)
                 name = $"{context.User.Identity.Name}";
@@ -28,7 +26,6 @@
     </NotAuthorized>
 </AuthorizeView>
 
-
 <h1 class="title-main">Friends of Award</h1>
 
 <p class="subtitle">
@@ -44,14 +41,14 @@
     Diese Abstimmung ist anonym und auf ein Gerät beschränkt!
 </p>
 
-
 <div class="button-grid">
-    @foreach (var item in Items)
+    @foreach (var da in Diplomarbeiten)
     {
-        <button class="number-button @(GetButtonClass(item))"
-                @onclick="() => ClickButton(item)"
-                @ondblclick="() => DoubleClickButton(item)">
-            @GetStars(item) @item
+        <button class="number-button @(GetButtonClass(da.Id))"
+                title="@da.Titel"
+                @onclick="() => ClickButton(da.Id)"
+                @ondblclick="() => DoubleClickButton(da.Id)">
+            @GetStars(da.Id) @da.Id
         </button>
     }
 </div>
@@ -60,15 +57,12 @@
     Offen: @RemainingFavorites Favoriten, @RemainingTop Topfavorit
 </p>
 
-
 <div class="submit-container">
     <button class="submit-button">
         Bewertung absenden
     </button>
 </div>
 
-
-@* ADMINBEREICH – wird nur angezeigt, wenn showAdmin == true *@
 @if (showAdmin)
 {
     <div class="admin-panel">
@@ -84,13 +78,9 @@
     </div>
 }
 
-@* HAUS-ICON UNTEN RECHTS *@
 <button class="home-button" @onclick="ToggleAdmin">
     🏠
 </button>
-
-
-
 
 <style>
     body {
@@ -98,105 +88,117 @@
     }
 </style>
 
-
-
 @code {
-    void Btn_Login()
-    {
-        MyNavMgr.NavigateTo("/Login");
-    }
+    void Btn_Login() => MyNavMgr.NavigateTo("/Login");
 
     void Btn_Logout()
     {
-        if (MyAuthStateProvider != null)
-            MyAuthStateProvider.Logout();
-        else
-            Console.WriteLine("Fatal Error: AuthProvider == null!!");
+        MyAuthStateProvider?.Logout();
     }
 
-    //EMIL
-    // 👉 HIER legst du fest, wie viele Buttons es gibt:
-    // Beispiel: 1–20
-    public List<int> Items { get; set; } = Enumerable.Range(1, 20).ToList();
+    public class DiplomarbeitInfo
+    {
+        public int Id { get; set; }
+        public string Titel { get; set; } = string.Empty;
+    }
 
-    // Oder 1–12:
-    // public List<int> Items { get; set; } = Enumerable.Range(1, 12).ToList();
+    private List<string> Diplomarbeitstitel = new()
+    {
+        "Smart Home Monitoring System",
+        "KI-gestützte Bildauswertung",
+        "Mobile App für Schulorganisation",
+        "IoT Energieverbrauchsanalyse",
+        "Webplattform Event-Management",
+        "Autonomes Robotikfahrzeug",
+        "E-Learning Portal",
+        "3D-Drucker Monitoring",
+        "Smart Garden",
+        "Chatbot Schul-FAQ",
+        "RFID Zeiterfassung",
+        "VR Physik Lernapp",
+        "Coding Lernplattform",
+        "Ticket-System Schule",
+        "Smart Locker System",
+        "Verkehrsanalyse KI",
+        "Fitness Tracker BLE",
+        "Online-Abstimmungssystem",
+        "Raumbelegungsanzeige"
+    };
 
-    // Oder 100 Stück:
-    // public List<int> Items { get; set; } = Enumerable.Range(1, 100).ToList();
+    public List<DiplomarbeitInfo> Diplomarbeiten { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        int idCounter = 1;
+        foreach (var titel in Diplomarbeitstitel)
+        {
+            Diplomarbeiten.Add(new DiplomarbeitInfo
+            {
+                Id = idCounter++,
+                Titel = titel
+            });
+        }
+    }
 
     private int MaxFavorites = 5;
-
     private HashSet<int> favorites = new();
     private int? topfavorite = null;
 
     private int RemainingFavorites => MaxFavorites - favorites.Count;
     private int RemainingTop => topfavorite == null ? 1 : 0;
 
-    private bool IsFavorite(int n) => favorites.Contains(n);
-    private bool IsTopFavorite(int n) => topfavorite == n;
+    private bool IsFavorite(int id) => favorites.Contains(id);
+    private bool IsTopFavorite(int id) => topfavorite == id;
 
-    private string GetButtonClass(int n)
-        => IsTopFavorite(n) ? "topfavorite"
-         : IsFavorite(n) ? "favorite"
+    private string GetButtonClass(int id)
+        => IsTopFavorite(id) ? "topfavorite"
+         : IsFavorite(id) ? "favorite"
          : "";
 
-    private string GetStars(int n)
-        => IsTopFavorite(n) ? "⭐⭐ "
-         : IsFavorite(n) ? "⭐ "
+    private string GetStars(int id)
+        => IsTopFavorite(id) ? "⭐⭐ "
+         : IsFavorite(id) ? "⭐ "
          : "";
 
-    // --- Klick ---
-    private void ClickButton(int n)
+    private void ClickButton(int id)
     {
-        if (IsTopFavorite(n))
-            return;
+        if (IsTopFavorite(id)) return;
 
-        if (IsFavorite(n))
+        if (IsFavorite(id))
         {
-            favorites.Remove(n);
+            favorites.Remove(id);
             return;
         }
 
-        if (favorites.Count >= MaxFavorites)
-            return;
+        if (favorites.Count >= MaxFavorites) return;
 
-        favorites.Add(n);
+        favorites.Add(id);
     }
 
-    // --- Doppelklick ---
-    private void DoubleClickButton(int n)
+    private void DoubleClickButton(int id)
     {
-        if (IsTopFavorite(n))
+        if (IsTopFavorite(id))
         {
             topfavorite = null;
             return;
         }
 
-        topfavorite = n;
-        favorites.Remove(n);
+        topfavorite = id;
+        favorites.Remove(id);
     }
-
-
 
     private bool showAdmin = false;
     private string adminCode = string.Empty;
 
-    private void ToggleAdmin()
-    {
-        showAdmin = !showAdmin;   // klick = ein/ausblenden
-    }
+    private void ToggleAdmin() => showAdmin = !showAdmin;
 
     private void OnLogin()
     {
-        // Hier später deine Login-Logik
         Console.WriteLine($"Login mit Code: {adminCode}");
     }
 
     private void OnLogout()
     {
         adminCode = string.Empty;
-        // Hier später deine Logout-Logik
     }
-
 }
