@@ -54,7 +54,7 @@
     </button>
 </div>
 
-@if (showAdmin)
+@*if (showAdmin)
 {
     <div class="admin-panel">
         <h2 class="admin-title">Adminbereich</h2>
@@ -67,7 +67,7 @@
             <button @onclick="OnLogout">Abmelden</button>
         </div>
     </div>
-}
+}*@
 
 <button class="home-button" @onclick="ToggleAdmin">
     🏠
@@ -186,6 +186,7 @@
     private void OnLogin()
     {
         Console.WriteLine($"Login mit Code: {adminCode}");
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
