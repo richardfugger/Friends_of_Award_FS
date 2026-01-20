@@ -42,7 +42,7 @@
             return;
         }
 
-        Friends_of_Award_FS_Lib.Admin admin = new(email, password);
+        Friends_of_Award_FS_Lib.Models.Admin admin = new(email, password);
         isAdmin = admin.CheckAdminLoginData();
 
         if (isAdmin)

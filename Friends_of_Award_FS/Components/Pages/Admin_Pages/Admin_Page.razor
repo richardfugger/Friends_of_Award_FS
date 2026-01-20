@@ -1,6 +1,7 @@
 ﻿@page "/admin"
 @rendermode InteractiveServer
 @using Blazor_WithAuth_ForSWP5
+@using Friends_of_Award_FS_Lib.Services
 @inject NavigationManager MyNavMgr
 @inject MyCustomAuthStateProvider? MyAuthStateProvider
 @using Friends_of_Award_FS_Lib
@@ -72,10 +73,10 @@
 
         for (int i = 0; i < qrCodeCount; i++)
         {
-            string token = Token.GenerateToken();
+            string token = TokenService.GenerateToken();
 
             // Token in DB speichern
-            bool saved = Token.SaveTokenToDatabase(token);
+            bool saved = TokenService.SaveTokenToDatabase(token);
             if (!saved)
             {
                 errorCount++;

@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 @inject NavigationManager Nav
 @using Friends_of_Award_FS_Lib
+@using Friends_of_Award_FS_Lib.Services
 @using QRCoder
 
 <div class="qr-wrapper">
@@ -36,7 +37,7 @@
 
     protected override void OnInitialized()
     {
-        unusedTokenList = Token.LoadTokenFromDb();
+        unusedTokenList = TokenService.LoadTokenFromDb();
         LoadNextQr();
     }
 
@@ -64,7 +65,7 @@
     {
         if (unusedTokenList.Count != 0)
         {       
-            Token.MarkAsUsed(unusedTokenList[^1]);
+            TokenService.MarkAsUsed(unusedTokenList[^1]);
             unusedTokenList.RemoveAt(unusedTokenList.Count - 1);
             LoadNextQr();
         }

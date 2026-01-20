@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace Friends_of_Award_FS_Lib
+namespace Friends_of_Award_FS_Lib.Models
 {
     public class Admin
     {

@@ -8,9 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using static QRCoder.PayloadGenerator;
 
-namespace Friends_of_Award_FS_Lib
+namespace Friends_of_Award_FS_Lib.Services
 {
-    public class Token
+    public class TokenService
     {
         public static string GenerateToken(int byteLength = 32)
         {

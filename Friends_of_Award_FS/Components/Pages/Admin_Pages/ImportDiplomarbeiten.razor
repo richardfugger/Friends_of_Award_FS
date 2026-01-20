@@ -1,0 +1,66 @@
+﻿@page "/admin/import"
+@using Friends_of_Award_FS_Lib.Services
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.Components.Forms
+@inject DiplomarbeitenImportService ImportService
+
+<h3>Diplomarbeiten – Excel Import</h3>
+
+<p>
+    Spalten: <b>Nr | AbteilungKürzel | Titel | Autor:innen</b><br />
+    Erlaubt: MB, ME, WII, WIE, GT<br />
+    ⚠️ Beim Import wird die bestehende Liste vollständig ersetzt!
+</p>
+
+<form enctype="multipart/form-data">
+    <InputFile OnChange="OnFileSelected" accept=".xlsx" />
+</form>
+
+@if (!string.IsNullOrEmpty(Status))
+{
+    <p><b>@Status</b></p>
+}
+
+@if (Errors.Count > 0)
+{
+    <ul>
+        @foreach (var e in Errors)
+        {
+            <li style="color:red">@e</li>
+        }
+    </ul>
+}
+
+@code {
+    string? Status;
+    List<string> Errors = new();
+
+    async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        Console.WriteLine("[Import Page] Method enetred");
+
+        Errors.Clear();
+        Status = "Import läuft...";
+
+        try
+        {
+            await using var uploadStream = e.File.OpenReadStream(10 * 1024 * 1024);
+            using var ms = new MemoryStream();
+
+            await uploadStream.CopyToAsync(ms);
+            ms.Position = 0;
+
+            var result = ImportService.ImportAndReplace(ms);
+
+            Errors = result.errors;
+            Status = Errors.Count == 0
+                ? $"Import erfolgreich ({result.imported} Einträge)."
+                : "Import fehlgeschlagen.";
+        }
+        catch (Exception ex)
+        {
+            Status = "Fehler beim Import.";
+            Errors.Add(ex.Message);
+        }
+    }
+}
