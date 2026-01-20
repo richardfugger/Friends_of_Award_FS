@@ -4,39 +4,55 @@
 @using Microsoft.AspNetCore.Components.Forms
 @inject DiplomarbeitenImportService ImportService
 
-<h3>Diplomarbeiten – Excel Import</h3>
+<div class="admin-import">
+    <h3>Diplomarbeiten – Excel Import</h3>
 
-<p>
-    Spalten: <b>Nr | AbteilungKürzel | Titel | Autor:innen</b><br />
-    Erlaubt: MB, ME, WII, WIE, GT<br />
-    ⚠️ Beim Import wird die bestehende Liste vollständig ersetzt!
-</p>
+    <p>
+        Spalten: <b>Nr | AbteilungKürzel | Titel | Autor:innen</b><br />
+        Erlaubt: MB, ME, WII, WIE, GT
+    </p>
 
-<form enctype="multipart/form-data">
-    <InputFile OnChange="OnFileSelected" accept=".xlsx" />
-</form>
+    <div class="warning">
+        ⚠️ Beim Import wird die bestehende Liste vollständig ersetzt!
+    </div>
 
-@if (!string.IsNullOrEmpty(Status))
-{
-    <p><b>@Status</b></p>
-}
+    <form enctype="multipart/form-data" class="file-upload">
+        <InputFile id="excelUpload"
+                   OnChange="OnFileSelected"
+                   accept=".xlsx"
+                   class="file-input" />
 
-@if (Errors.Count > 0)
-{
-    <ul>
-        @foreach (var e in Errors)
+        <label for="excelUpload" class="file-button">
+            📂 Datei auswählen
+        </label>
+
+        @if (!string.IsNullOrEmpty(SelectedFileName))
         {
-            <li style="color:red">@e</li>
+            <span class="file-name">@SelectedFileName</span>
         }
-    </ul>
-}
+    </form>
+
+    @if (Errors.Count > 0)
+    {
+        <ul>
+            @foreach (var e in Errors)
+            {
+                <li>@e</li>
+            }
+        </ul>
+    }
+</div>
+
 
 @code {
     string? Status;
     List<string> Errors = new();
+    string? SelectedFileName;
 
     async Task OnFileSelected(InputFileChangeEventArgs e)
     {
+        SelectedFileName = e.File.Name;
+
         Console.WriteLine("[Import Page] Method enetred");
 
         Errors.Clear();

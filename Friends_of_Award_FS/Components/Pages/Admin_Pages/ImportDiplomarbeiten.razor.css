@@ -1,0 +1,153 @@
+﻿/* ===== Base Layout ===== */
+.admin-import {
+    max-width: 720px;
+    margin: 2.5rem auto;
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+    /* ===== Headings ===== */
+    .admin-import h3 {
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937; /* slate-800 */
+    }
+
+    /* ===== Info Text ===== */
+    .admin-import p {
+        margin-bottom: 1rem;
+        color: #374151; /* gray-700 */
+        line-height: 1.5;
+    }
+
+    .admin-import b {
+        color: #111827;
+    }
+
+    /* ===== Warning Highlight ===== */
+    .admin-import .warning {
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        color: #9a3412;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+
+    /* ===== File Upload ===== */
+    .admin-import form {
+        margin-top: 1.5rem;
+    }
+
+    .admin-import input[type="file"] {
+        display: block;
+        width: 100%;
+        padding: 0.6rem;
+        border-radius: 8px;
+        border: 2px dashed #d1d5db;
+        background: #f9fafb;
+        cursor: pointer;
+        transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+        .admin-import input[type="file"]:hover {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+
+    /* ===== Status Message ===== */
+    .admin-import .status {
+        margin-top: 1.5rem;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        background: #e0f2fe;
+        color: #075985;
+        border: 1px solid #bae6fd;
+    }
+
+        /* ===== Success ===== */
+        .admin-import .status.success {
+            background: #ecfdf5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+
+        /* ===== Error ===== */
+        .admin-import .status.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+
+    /* ===== Error List ===== */
+    .admin-import ul {
+        margin-top: 1rem;
+        padding-left: 1.25rem;
+    }
+
+    .admin-import li {
+        margin-bottom: 0.4rem;
+        color: #b91c1c;
+        font-size: 0.95rem;
+    }
+
+/* ===== Small Screens ===== */
+@media (max-width: 600px) {
+    .admin-import {
+        margin: 1rem;
+        padding: 1.25rem;
+    }
+}
+
+/* Container */
+.file-upload {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.25rem;
+}
+
+/* REALLY hide native input */
+.file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Styled button */
+.file-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.3rem;
+    background: #2563eb;
+    color: #ffffff;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .file-button:hover {
+        background: #1d4ed8;
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    }
+
+/* Filename */
+.file-name {
+    font-size: 0.9rem;
+    color: #374151;
+}
