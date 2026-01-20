@@ -44,6 +44,10 @@
                     View QR-Codes
                 </button>
 
+                <button type="button" @onclick="Btn_ImportDiplomarbeiten">
+                    Import Diplomarbeiten
+                </button>
+
                 <button class="logout-btn" @onclick="Logout">
                     Logout
                 </button>
@@ -52,7 +56,7 @@
     </Authorized>
 
     <NotAuthorized>
-        <p>Weiterleitung...</p>
+        <RedirectToLogin />
     </NotAuthorized>
 </AuthorizeView>
 
@@ -92,7 +96,7 @@
 
     private void Btn_NavToQrCodes()
     {
-        MyNavMgr.NavigateTo("/qrcodes");
+        MyNavMgr.NavigateTo("/admin/qrcodes");
     }
 
     private void Logout()
@@ -100,6 +104,18 @@
         MyAuthStateProvider.Logout();
         MyNavMgr.NavigateTo("/");
     }
+
+    private void Btn_ImportDiplomarbeiten()
+    {
+        MyNavMgr.NavigateTo("/admin/import");
+    }
+
+    /*
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Yield();
+        MyNavMgr.NavigateTo("/adminlogin");
+    }*/
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

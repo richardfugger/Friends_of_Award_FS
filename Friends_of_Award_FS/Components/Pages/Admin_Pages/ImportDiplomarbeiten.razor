@@ -1,47 +1,59 @@
 ﻿@page "/admin/import"
+@using Blazor_WithAuth_ForSWP5
 @using Friends_of_Award_FS_Lib.Services
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager MyNavMgr
+@inject MyCustomAuthStateProvider? MyAuthStateProvider
 @inject DiplomarbeitenImportService ImportService
 
-<div class="admin-import">
-    <h3>Diplomarbeiten – Excel Import</h3>
+<AuthorizeView>
+    <Authorized>
+        <div class="admin-import">
+            <h3>Diplomarbeiten – Excel Import</h3>
 
-    <p>
-        Spalten: <b>Nr | AbteilungKürzel | Titel | Autor:innen</b><br />
-        Erlaubt: MB, ME, WII, WIE, GT
-    </p>
+            <p>
+                Spalten: <b>Nr | AbteilungKürzel | Titel | Autor:innen</b><br />
+                Erlaubt: MB, ME, WII, WIE, GT
+            </p>
 
-    <div class="warning">
-        ⚠️ Beim Import wird die bestehende Liste vollständig ersetzt!
-    </div>
+            <div class="warning">
+                ⚠️ Beim Import wird die bestehende Liste vollständig ersetzt!
+            </div>
 
-    <form enctype="multipart/form-data" class="file-upload">
-        <InputFile id="excelUpload"
-                   OnChange="OnFileSelected"
-                   accept=".xlsx"
-                   class="file-input" />
+            <form enctype="multipart/form-data" class="file-upload">
+                <InputFile id="excelUpload"
+                           OnChange="OnFileSelected"
+                           accept=".xlsx"
+                           class="file-input" />
 
-        <label for="excelUpload" class="file-button">
-            📂 Datei auswählen
-        </label>
+                <label for="excelUpload" class="file-button">
+                    📂 Datei auswählen
+                </label>
 
-        @if (!string.IsNullOrEmpty(SelectedFileName))
-        {
-            <span class="file-name">@SelectedFileName</span>
-        }
-    </form>
+                @if (!string.IsNullOrEmpty(SelectedFileName))
+                {
+                    <span class="file-name">@SelectedFileName</span>
+                }
+            </form>
 
-    @if (Errors.Count > 0)
-    {
-        <ul>
-            @foreach (var e in Errors)
+            @if (Errors.Count > 0)
             {
-                <li>@e</li>
+                <ul>
+                    @foreach (var e in Errors)
+                    {
+                        <li>@e</li>
+                    }
+                </ul>
             }
-        </ul>
-    }
-</div>
+        </div>
+    </Authorized>
+
+    <NotAuthorized>
+        <p>Weiterleitung...</p>
+    </NotAuthorized>
+</AuthorizeView>
 
 
 @code {
@@ -79,4 +91,19 @@
             Errors.Add(ex.Message);
         }
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
+            var user = state.User;
+
+            if (!user.Identity.IsAuthenticated)
+            {
+                MyNavMgr.NavigateTo("/adminlogin", true);
+            }
+        }
+    }
+
 }
