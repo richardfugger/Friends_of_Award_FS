@@ -1,0 +1,29 @@
+﻿@inherits LayoutComponentBase
+@using Blazor_WithAuth_ForSWP5
+@inject NavigationManager MyNavMgr
+@inject MyCustomAuthStateProvider? MyAuthStateProvider
+
+<div class="admin-container">
+    <aside class="admin-sidebar">
+        <h2>🔐 Admin</h2>
+
+        <NavLink href="/admin" class="nav-btn">Dashboard</NavLink>
+        <NavLink href="/admin/qrcodes" class="nav-btn">QR Codes</NavLink>
+        <NavLink href="/admin/import" class="nav-btn">Import</NavLink>
+        <NavLink href="/admin/export" class="nav-btn">Export</NavLink>
+
+        <button class="nav-btn logout" @onclick="Logout">Logout</button>
+    </aside>
+
+    <main class="admin-content">
+        @Body
+    </main>
+</div>
+
+@code {
+    void Logout()
+    {
+        MyAuthStateProvider.Logout();
+        MyNavMgr.NavigateTo("/");
+    }
+}

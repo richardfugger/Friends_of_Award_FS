@@ -1,0 +1,28 @@
+﻿@page "/admin"
+@using Blazor_WithAuth_ForSWP5
+@using Friends_of_Award_FS.Components.Layout
+@layout AdminLayout
+@rendermode InteractiveServer
+@inject MyCustomAuthStateProvider MyAuthStateProvider
+@inject NavigationManager MyNavMgr
+
+<h2>Dashboard</h2>
+
+<p>Willkommen im Admin-Bereich.</p>
+
+<div class="dashboard-cards">
+
+    <NavLink href="/admin/qrcodes" class="card">
+        📦 QR Codes verwalten
+    </NavLink>
+
+    <NavLink href="/admin/import" class="card">
+        📥 Import Diplomarbeiten
+    </NavLink>
+
+    <NavLink href="/admin/export" class="card">
+        📤 Export Ergebnisse
+    </NavLink>
+
+</div>
+
