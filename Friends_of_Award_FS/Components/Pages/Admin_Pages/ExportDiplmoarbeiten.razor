@@ -1,0 +1,39 @@
+﻿@page "/admin/export"
+@rendermode InteractiveServer
+@using Blazor_WithAuth_ForSWP5
+@using Friends_of_Award_FS_Lib.Services
+@inject DiplomarbeitenExportService ExportService
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager MyNavMgr
+@inject MyCustomAuthStateProvider? MyAuthStateProvider
+@inject IJSRuntime JS
+
+<h3>ExportDiplmoarbeiten</h3>
+
+<button class="btn btn-success" @onclick="DownloadExcel">
+    Ergebnisse als Excel exportieren
+</button>
+
+@code {
+    private async Task DownloadExcel()
+    {
+        Console.WriteLine("Download Methode aufgerufen");
+        var bytes = ExportService.ExportErgebnisseToExcel();
+        await JS.InvokeVoidAsync("downloadFile", "Ergebnisse.xlsx", bytes);
+    }
+
+    @*protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
+            var user = state.User;
+
+            if (!user.Identity.IsAuthenticated)
+            {
+                MyNavMgr.NavigateTo("/adminlogin", true);
+            }
+        }
+    }*@
+}

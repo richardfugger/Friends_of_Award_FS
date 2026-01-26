@@ -7,7 +7,7 @@
 @using Friends_of_Award_FS_Lib
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Cryptography
-@using QRCoder
+@*@using QRCoder*@
 
 <AuthorizeView>
     <Authorized>
@@ -46,6 +46,10 @@
 
                 <button type="button" @onclick="Btn_ImportDiplomarbeiten">
                     Import Diplomarbeiten
+                </button>
+
+                <button type="button" @onclick="Btn_ExportDiplomarbeiten">
+                    Export Diplomarbeiten
                 </button>
 
                 <button class="logout-btn" @onclick="Logout">
@@ -108,6 +112,11 @@
     private void Btn_ImportDiplomarbeiten()
     {
         MyNavMgr.NavigateTo("/admin/import");
+    }
+
+    private void Btn_ExportDiplomarbeiten()
+    {
+        MyNavMgr.NavigateTo("/admin/export");
     }
 
     /*
