@@ -1,15 +1,19 @@
 ﻿@page "/admin/qrcodegeneration"
+
 @rendermode InteractiveServer
+
 @using Blazor_WithAuth_ForSWP5
 @using Friends_of_Award_FS.Components.Layout
 @using Friends_of_Award_FS_Lib.Services
-@inject NavigationManager MyNavMgr
-@inject MyCustomAuthStateProvider? MyAuthStateProvider
 @using Friends_of_Award_FS_Lib
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Cryptography
+
+@inject NavigationManager MyNavMgr
+@inject MyCustomAuthStateProvider? MyAuthStateProvider
+@inject TokenService TokenService
+
 @layout AdminLayout
-@*@using QRCoder*@
 
 <AuthorizeView>
     <Authorized>

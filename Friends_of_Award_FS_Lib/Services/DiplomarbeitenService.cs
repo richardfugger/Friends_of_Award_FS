@@ -153,6 +153,48 @@ new(StringComparer.OrdinalIgnoreCase)
         }
 
 
+        public List<Ergebnis> GetDiplomarbeitenPlusErgebnis()
+        {
+            string sql = @"
+        SELECT 
+            e.ErgebnisID,
+            e.DiplomarbeitNr,
+            e.Punkte,
+            d.Nr,
+            d.AbteilungKuerzel,
+            d.Titel,
+            d.Autoren
+        FROM foa_ergebnisse e
+        JOIN foa_diplomarbeiten d 
+            ON e.DiplomarbeitNr = d.Nr
+        ORDER BY e.Punkte DESC;
+    ";
+
+            DataTable table = DbWrapperMySqlV2.Wrapper.RunQuery(sql);
+
+            var result = new List<Ergebnis>();
+
+            foreach (DataRow row in table.Rows)
+            {
+                var diplomarbeit = new Diplomarbeit(
+                    nr: Convert.ToInt32(row["Nr"]),
+                    abteilungsKuerzel: row["AbteilungKuerzel"].ToString()!,
+                    titel: row["Titel"].ToString()!,
+                    autoren: row["Autoren"].ToString()!
+                );
+
+                var ergebnis = new Ergebnis(
+                    ergebnisID: Convert.ToInt32(row["ErgebnisID"]),
+                    diplomarbeitNr: Convert.ToInt32(row["DiplomarbeitNr"]),
+                    diplomarbeit: diplomarbeit,
+                    punkte: Convert.ToInt32(row["Punkte"])
+                );
+
+                result.Add(ergebnis);
+            }
+
+            return result;
+        }
 
     }
 }

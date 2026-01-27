@@ -12,7 +12,7 @@ namespace Friends_of_Award_FS_Lib.Services
 {
     public class TokenService
     {
-        public static string GenerateToken(int byteLength = 32)
+        public string GenerateToken(int byteLength = 32)
         {
             byte[] randomBytes;
             bool isUniqueToken = false;
@@ -33,7 +33,7 @@ namespace Friends_of_Award_FS_Lib.Services
             return hexString;
         }
 
-        public static bool CheckTokenUniqueness(string token)
+        public bool CheckTokenUniqueness(string token)
         {
             DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
 
@@ -57,7 +57,7 @@ namespace Friends_of_Award_FS_Lib.Services
             }
         }
 
-        public static bool SaveTokenToDatabase(string token)
+        public bool SaveTokenToDatabase(string token)
         {
             bool success = false;
             DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
@@ -79,7 +79,7 @@ namespace Friends_of_Award_FS_Lib.Services
             return success;
         }
 
-        public static List<string> LoadTokenFromDb()
+        public List<string> LoadTokenFromDb()
         {
             DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
             DataTable dt;
@@ -106,7 +106,7 @@ namespace Friends_of_Award_FS_Lib.Services
             return unusedTokenList;
         }
 
-        public static bool MarkAsUsed(string token)
+        public bool MarkAsUsed(string token)
         {
             bool success = false;
             DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
@@ -128,7 +128,7 @@ namespace Friends_of_Award_FS_Lib.Services
             return success;
         }
 
-        public static bool IsValidUnusedToken(string token)
+        public bool IsValidUnusedToken(string token)
         {
             DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
 
@@ -145,7 +145,7 @@ namespace Friends_of_Award_FS_Lib.Services
             return Convert.ToInt32(result) == 1;
         }
 
-        public static bool MarkAsVoted(string token)
+        public bool MarkAsVoted(string token)
         {
             bool success = false;
             DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
@@ -166,5 +166,23 @@ namespace Friends_of_Award_FS_Lib.Services
 
             return success;
         }
+    
+        public static int LoadCountUnusedTokens()
+        {
+            DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
+
+            string sql = "SELECT COUNT(*) FROM foa_qr_tokens WHERE used = 0";
+
+            var result = wrappr.RunQueryScalar(sql);
+
+            if (result == null)
+                return 0;
+
+            if (!int.TryParse(result.ToString(), out int unusedToken))
+                return 0;
+
+            return unusedToken;
+        }
+    
     }
 }

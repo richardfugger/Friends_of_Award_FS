@@ -1,38 +1,132 @@
 ﻿@page "/admin"
+
+@rendermode InteractiveServer
+
 @using Blazor_WithAuth_ForSWP5
 @using Friends_of_Award_FS.Components.Layout
-@layout AdminLayout
-@rendermode InteractiveServer
-@inject MyCustomAuthStateProvider MyAuthStateProvider
+@using Friends_of_Award_FS_Lib.Models
+@using Friends_of_Award_FS_Lib.Services
 @using Microsoft.AspNetCore.Components.Authorization
+
+@layout AdminLayout
+
+@inject MyCustomAuthStateProvider MyAuthStateProvider
 @inject NavigationManager MyNavMgr
+@inject DiplomarbeitenService DaService
+@inject TokenService TokenService
 
-<h2>Dashboard</h2>
 
-<AuthorizeView>
-    <Authorized>
-        @{
-            string name = "unknown";
-            if (context.User.Identity != null)
-            {
-                name = context.User.Identity.Name ?? "unknown";
+<section class="admin-dashboard">
+    <h1 class="dashboard-title">Admin Dashboard</h1>
+
+    <AuthorizeView>
+        <Authorized>
+            @{
+                string name = context.User.Identity?.Name ?? "Admin";
             }
-        }
 
-        <div class="admin-wrapper">
-            <div class="admin-card">
-                <h3>🔐 Admin Bereich</h3>
-                <p class="welcome">
-                    Willkommen im Admin-Bereich, <strong>@name</strong>!
-                </p>
+            <div class="dashboard-header">
+                <div class="welcome-card">
+                    <h2>Willkommen @name</h2>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🔑</div>
+                    <div class="stat-content">
+                        <span class="stat-label">Ungenutzte QR-Tokens</span>
+                        <span class="stat-value">@unusedTokens</span>
+                    </div>
+                </div>
             </div>
-        </div>
-    </Authorized>
-
-    <NotAuthorized>
-        <p>Weiterleitung</p>
-    </NotAuthorized>
-</AuthorizeView>
 
 
+            <div class="dashboard-content">
+                <div class="card">
+                    <h3>Aktueller Stand</h3>
 
+                    @if (ergebnisse == null)
+                    {
+                        <div class="status loading">Daten werden geladen…</div>
+                    }
+                    else if (ergebnisse.Count == 0)
+                    {
+                        <div class="status empty">Keine Diplomarbeiten in Datenbank vorhanden.</div>
+                    }
+                    else
+                    {
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Platz</th>
+                                        <th>Abteilung</th>
+                                        <th>Titel</th>
+                                        <th>Autoren</th>
+                                        <th>Punkte</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int platz = 1;
+                                    }
+                                    @foreach (var e in ergebnisse)
+                                    {
+                                        <tr>
+                                            <td>@platz</td>
+                                            <td>@e.Diplomarbeit.AbteilungsKuerzel</td>
+                                            <td>@e.Diplomarbeit.Titel</td>
+                                            <td>@e.Diplomarbeit.Autoren</td>
+                                            <td class="punkte">@e.Punkte</td>
+                                        </tr>
+
+                                        platz++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <button class="btn-reload" @onclick="ReloadErgebnisse">
+                            🔄 Neu laden
+                        </button>
+                    }
+                </div>
+            
+            </div>
+        </Authorized>
+
+        <NotAuthorized>
+            <div class="status forbidden">
+                Zugriff verweigert – du wirst weitergeleitet…
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+</section>
+
+
+
+@code {
+    private List<Ergebnis>? ergebnisse;
+    private int unusedTokens = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadErgebnisse();
+        await LoadCountUnusedToken();
+    }
+
+    private async Task ReloadErgebnisse()
+    {
+        await LoadErgebnisse();
+    }
+
+    private async Task LoadErgebnisse()
+    {
+        ergebnisse = null;
+        await Task.Delay(100);
+        ergebnisse = DaService.GetDiplomarbeitenPlusErgebnis();
+    }
+
+    private async Task LoadCountUnusedToken()
+    {
+        unusedTokens = TokenService.LoadCountUnusedTokens();
+    }
+}

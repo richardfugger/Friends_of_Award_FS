@@ -1,10 +1,14 @@
 ﻿@page "/qr-login"
+
 @rendermode InteractiveServer
+
 @using Blazor_WithAuth_ForSWP5
 @using Friends_of_Award_FS_Lib
 @using Friends_of_Award_FS_Lib.Services
+
 @inject NavigationManager MyNavMgr
 @inject MyCustomAuthStateProvider? MyAuthStateProvider
+@inject TokenService TokenService
 
 <h3>QrCode_Login_Page</h3>
 
