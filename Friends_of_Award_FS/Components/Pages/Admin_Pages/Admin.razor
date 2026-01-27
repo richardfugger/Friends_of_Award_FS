@@ -4,25 +4,35 @@
 @layout AdminLayout
 @rendermode InteractiveServer
 @inject MyCustomAuthStateProvider MyAuthStateProvider
+@using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager MyNavMgr
 
 <h2>Dashboard</h2>
 
-<p>Willkommen im Admin-Bereich.</p>
+<AuthorizeView>
+    <Authorized>
+        @{
+            string name = "unknown";
+            if (context.User.Identity != null)
+            {
+                name = context.User.Identity.Name ?? "unknown";
+            }
+        }
 
-@*<div class="dashboard-cards">
+        <div class="admin-wrapper">
+            <div class="admin-card">
+                <h3>🔐 Admin Bereich</h3>
+                <p class="welcome">
+                    Willkommen im Admin-Bereich, <strong>@name</strong>!
+                </p>
+            </div>
+        </div>
+    </Authorized>
 
-    <NavLink href="/admin/qrcodes" class="card">
-        📦 QR Codes verwalten
-    </NavLink>
+    <NotAuthorized>
+        <p>Weiterleitung</p>
+    </NotAuthorized>
+</AuthorizeView>
 
-    <NavLink href="/admin/import" class="card">
-        📥 Import Diplomarbeiten
-    </NavLink>
 
-    <NavLink href="/admin/export" class="card">
-        📤 Export Ergebnisse
-    </NavLink>
-
-</div>*@
 

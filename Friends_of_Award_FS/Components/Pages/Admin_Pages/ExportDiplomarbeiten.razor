@@ -3,7 +3,7 @@
 @using Blazor_WithAuth_ForSWP5
 @using Friends_of_Award_FS.Components.Layout
 @using Friends_of_Award_FS_Lib.Services
-@inject DiplomarbeitenExportService ExportService
+@inject DiplomarbeitenService DaService
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager MyNavMgr
@@ -14,11 +14,22 @@
 
 <AuthorizeView>
     <Authorized>
-        <h3>ExportDiplmoarbeiten</h3>
+        <div class="export-page">
 
-        <button class="btn btn-success" @onclick="DownloadExcel">
-            Ergebnisse als Excel exportieren
-        </button>
+            <div class="export-card">
+                <div class="export-icon">📤</div>
+
+                <h2>Ergebnisse exportieren</h2>
+                <p class="export-description">
+                    Hier kannst du alle ausgewerteten Diplomarbeiten als Excel-Datei herunterladen.
+                </p>
+
+                <button class="btn btn-primary export-button" @onclick="DownloadExcel">
+                    📊 Excel-Datei herunterladen
+                </button>
+            </div>
+
+        </div>
     </Authorized>
 
     <NotAuthorized>
@@ -26,11 +37,12 @@
     </NotAuthorized>
 </AuthorizeView>
 
+
 @code {
     private async Task DownloadExcel()
     {
         Console.WriteLine("Download Methode aufgerufen");
-        var bytes = ExportService.ExportErgebnisseToExcel();
+        var bytes = DaService.ExportErgebnisseToExcel();
         await JS.InvokeVoidAsync("downloadFile", "Ergebnisse.xlsx", bytes);
     }
 

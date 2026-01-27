@@ -1,0 +1,85 @@
+﻿@page "/admin/qrcodegeneration"
+@rendermode InteractiveServer
+@using Blazor_WithAuth_ForSWP5
+@using Friends_of_Award_FS.Components.Layout
+@using Friends_of_Award_FS_Lib.Services
+@inject NavigationManager MyNavMgr
+@inject MyCustomAuthStateProvider? MyAuthStateProvider
+@using Friends_of_Award_FS_Lib
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Cryptography
+@layout AdminLayout
+@*@using QRCoder*@
+
+<AuthorizeView>
+    <Authorized>
+        <div class="qrcode-page">
+
+            <div class="qrcode-card">
+                <div class="qrcode-icon">🔑</div>
+
+                <h2>QR-Codes generieren</h2>
+                <p class="qrcode-description">
+                    Gib an, wie viele neue QR-Codes erzeugt werden sollen.
+                </p>
+
+                <form class="qrcode-form">
+                    <label class="qrcode-label">
+                        Anzahl QR-Codes
+                        <input type="number" min="1" @bind="qrCodeCount" class="qrcode-input" />
+                    </label>
+
+                    <button type="button" class="qrcode-button" @onclick="Btn_GenerateQrCodes">
+                        🔄 QR-Codes generieren
+                    </button>
+                </form>
+
+                @if (!string.IsNullOrWhiteSpace(message))
+                {
+                    <div class="qrcode-message">@message</div>
+                }
+            </div>
+
+        </div>
+    </Authorized>
+
+    <NotAuthorized>
+        <p>Weiterleitung…</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+
+
+@code {
+    private string? username = "";
+    private int qrCodeCount = 0;
+    private string message = "";
+    int errorCount = 0;
+
+
+    private void Btn_GenerateQrCodes()
+    {
+        if (qrCodeCount <= 0)
+            return;
+
+        for (int i = 0; i < qrCodeCount; i++)
+        {
+            string token = TokenService.GenerateToken();
+
+            // Token in DB speichern
+            bool saved = TokenService.SaveTokenToDatabase(token);
+            if (!saved)
+            {
+                errorCount++;
+                message = $"{errorCount}/{qrCodeCount} QR-Code Generations failed.";
+                continue;
+            }
+        }
+        if (errorCount == 0)
+        {
+            message = $"{qrCodeCount} QR-Codes have been generated";
+        }
+    }
+}

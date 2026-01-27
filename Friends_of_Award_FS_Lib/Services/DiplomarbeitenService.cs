@@ -1,14 +1,56 @@
 ﻿using ClosedXML.Excel;
 using Friends_of_Award_FS_Lib.Models;
 using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace Friends_of_Award_FS_Lib.Services
 {
-    public class DiplomarbeitenImportService
+    public class DiplomarbeitenService
     {
+        public byte[] ExportErgebnisseToExcel()
+        {
+            string sql = @"
+        SELECT 
+            d.AbteilungKuerzel,
+            d.Titel,
+            d.Autoren,
+            e.Punkte
+        FROM foa_diplomarbeiten d
+        JOIN foa_ergebnisse e ON d.Nr = e.DiplomarbeitNr;
+    ";
+
+            // Daten über Wrapper holen
+            DataTable table = DbWrapperMySqlV2.Wrapper.RunQuery(sql);
+
+            // Excel erzeugen
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Ergebnisse");
+
+            // Kopfzeile
+            for (int col = 0; col < table.Columns.Count; col++)
+            {
+                worksheet.Cell(1, col + 1).Value = table.Columns[col].ColumnName;
+            }
+
+            // Daten
+            for (int row = 0; row < table.Rows.Count; row++)
+            {
+                for (int col = 0; col < table.Columns.Count; col++)
+                {
+                    worksheet.Cell(row + 2, col + 1).Value = table.Rows[row][col]?.ToString();
+                }
+            }
+
+            worksheet.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
+        }
+
         private static readonly HashSet<string> AllowedAbteilungen =
-        new(StringComparer.OrdinalIgnoreCase)
-        { "MB", "ME", "WII", "WIE", "GT" };
+new(StringComparer.OrdinalIgnoreCase)
+{ "MB", "ME", "WII", "WIE", "GT" };
 
         public (int imported, List<string> errors) ImportAndReplace(Stream excelStream)
         {
@@ -109,5 +151,8 @@ namespace Friends_of_Award_FS_Lib.Services
 
             return (rows.Count, errors);
         }
+
+
+
     }
 }

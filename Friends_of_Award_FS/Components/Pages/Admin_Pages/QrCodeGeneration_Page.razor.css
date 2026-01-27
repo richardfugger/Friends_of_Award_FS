@@ -1,89 +1,84 @@
-﻿.import-page {
+﻿.qrcode-page {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: calc(100vh - 4rem);
 }
 
-.import-card {
+.qrcode-card {
     background-color: white;
     padding: 2.5rem 3rem;
     border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-    max-width: 520px;
+    max-width: 420px;
     width: 100%;
     text-align: center;
 }
 
-.import-icon {
+.qrcode-icon {
     font-size: 3rem;
     margin-bottom: 1rem;
 }
 
-.import-description {
+.qrcode-description {
     color: #6b7280;
     margin-bottom: 1.5rem;
     font-size: 0.95rem;
 }
 
-.import-hint {
-    background-color: #f1f5f9;
-    padding: 0.75rem 1rem;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    margin-bottom: 1rem;
-}
-
-.import-warning {
-    background-color: #fff3cd;
-    color: #92400e;
-    padding: 0.75rem 1rem;
-    border-radius: 6px;
-    font-size: 0.85rem;
+.qrcode-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     margin-bottom: 1.5rem;
 }
 
-.file-upload {
+.qrcode-label {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-}
-
-.file-input {
-    display: none;
-}
-
-.file-button {
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    color: white;
-    padding: 0.7rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-    .file-button:hover {
-        background: linear-gradient(135deg, #16325c, #234a87);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-    }
-
-.file-name {
     font-size: 0.85rem;
+    text-align: left;
     color: #374151;
 }
 
-.import-status {
-    margin-top: 1rem;
-    font-weight: 500;
+.qrcode-input {
+    margin-top: 0.25rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    font-size: 0.9rem;
 }
 
-.import-errors {
-    margin-top: 0.75rem;
-    color: #b91c1c;
-    font-size: 0.85rem;
-    text-align: left;
+    .qrcode-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+    }
+
+.qrcode-button {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    border: none;
+    padding: 0.7rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+    .qrcode-button:hover {
+        background: linear-gradient(135deg, #16325c, #234a87);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    }
+
+    .qrcode-button:active {
+        transform: translateY(0);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
+
+.qrcode-message {
+    margin-top: 1rem;
+    font-weight: 500;
+    color: #1f2937;
 }

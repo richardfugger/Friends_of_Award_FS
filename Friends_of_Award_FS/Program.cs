@@ -14,8 +14,7 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<MyCustomAuthStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
   provider.GetRequiredService<MyCustomAuthStateProvider>());
-builder.Services.AddScoped<DiplomarbeitenImportService>();
-builder.Services.AddScoped<DiplomarbeitenExportService>();
+builder.Services.AddScoped<DiplomarbeitenService>();
 
 
 var app = builder.Build();

@@ -7,48 +7,62 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager MyNavMgr
 @inject MyCustomAuthStateProvider? MyAuthStateProvider
-@inject DiplomarbeitenImportService ImportService
+@inject DiplomarbeitenService DaService
 @layout AdminLayout
 
 <AuthorizeView>
     <Authorized>
-        <div class="admin-import">
-            <h3>Diplomarbeiten – Excel Import</h3>
+        <div class="import-page">
 
-            <p>
-                Spalten: <b>Nr | AbteilungKürzel | Titel | Autor:innen</b><br />
-                Erlaubt: MB, ME, WII, WIE, GT
-            </p>
+            <div class="import-card">
+                <div class="import-icon">📥</div>
 
-            <div class="warning">
-                ⚠️ Beim Import wird die bestehende Liste vollständig ersetzt!
+                <h2>Diplomarbeiten importieren</h2>
+                <p class="import-description">
+                    Lade eine Excel-Datei hoch, um die bestehende Liste zu ersetzen.
+                </p>
+
+                <div class="import-hint">
+                    Erwartete Spalten: <b>Nr | AbteilungKürzel | Titel | Autor:innen</b><br />
+                    Erlaubte Kürzel: MB, ME, WII, WIE, GT
+                </div>
+
+                <div class="import-warning">
+                    ⚠️ Achtung: Beim Import werden alle bestehenden Einträge überschrieben!
+                </div>
+
+                <form enctype="multipart/form-data" class="file-upload">
+                    <InputFile id="excelUpload"
+                               OnChange="OnFileSelected"
+                               accept=".xlsx"
+                               class="file-input" />
+
+                    <label for="excelUpload" class="file-button">
+                        📂 Excel-Datei auswählen
+                    </label>
+
+                    @if (!string.IsNullOrEmpty(SelectedFileName))
+                    {
+                        <div class="file-name">Ausgewählt: @SelectedFileName</div>
+                    }
+                </form>
+
+                @if (!string.IsNullOrEmpty(Status))
+                {
+                    <div class="import-status">@Status</div>
+                }
+
+                @if (Errors.Count > 0)
+                {
+                    <ul class="import-errors">
+                        @foreach (var e in Errors)
+                        {
+                            <li>@e</li>
+                        }
+                    </ul>
+                }
             </div>
 
-            <form enctype="multipart/form-data" class="file-upload">
-                <InputFile id="excelUpload"
-                           OnChange="OnFileSelected"
-                           accept=".xlsx"
-                           class="file-input" />
-
-                <label for="excelUpload" class="file-button">
-                    📂 Datei auswählen
-                </label>
-
-                @if (!string.IsNullOrEmpty(SelectedFileName))
-                {
-                    <span class="file-name">@SelectedFileName</span>
-                }
-            </form>
-
-            @if (Errors.Count > 0)
-            {
-                <ul>
-                    @foreach (var e in Errors)
-                    {
-                        <li>@e</li>
-                    }
-                </ul>
-            }
         </div>
     </Authorized>
 
@@ -80,7 +94,7 @@
             await uploadStream.CopyToAsync(ms);
             ms.Position = 0;
 
-            var result = ImportService.ImportAndReplace(ms);
+            var result = DaService.ImportAndReplace(ms);
 
             Errors = result.errors;
             Status = Errors.Count == 0
