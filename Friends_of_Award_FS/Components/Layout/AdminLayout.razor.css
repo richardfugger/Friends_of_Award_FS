@@ -1,43 +1,132 @@
-.admin-container {
+/* Grundlayout */
+.page {
     display: flex;
-    height: 100vh;
+    min-height: 100vh;
+    background-color: #f5f7fa;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
-.admin-sidebar {
-    width: 220px;
-    background: #1e3a8a;
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
     color: white;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
+    position: sticky;
+    top: 0;
 }
 
-    .admin-sidebar h2 {
-        margin-bottom: 20px;
+    /* Nav menu look like template */
+    .sidebar ::deep .nav-item {
+        font-size: 0.9rem;
+        padding-bottom: 0.5rem;
     }
 
-.nav-btn {
-    margin: 5px 0;
-    padding: 10px;
-    text-decoration: none;
-    background: #2563eb;
-    color: white;
-    border-radius: 6px;
-    text-align: center;
-}
+        .sidebar ::deep .nav-item:first-of-type {
+            padding-top: 1rem;
+        }
 
-    .nav-btn:hover {
-        background: #1d4ed8;
+    .sidebar ::deep .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        height: 3rem;
+        line-height: 3rem;
+        color: #d7d7d7;
+        border-radius: 4px;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        text-decoration: none;
     }
 
-.logout {
-    margin-top: auto;
-    background: #dc2626;
-}
+        /* hover */
+        .sidebar ::deep .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
 
-.admin-content {
+        /* active (like sample: grey box) */
+        .sidebar ::deep .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.25);
+            color: white;
+        }
+
+        /* icon sizing like template */
+        .sidebar ::deep .nav-link span {
+            font-size: 1.1rem;
+        }
+
+
+
+/* Main Content */
+main {
     flex: 1;
-    padding: 30px;
-    background: #f3f4f6;
+    padding: 1rem;
 }
 
+/* Top Row (Header in Sidebar) */
+.top-row {
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #d6d5d5;
+    height: 3.5rem;
+    display: flex;
+    align-items: center;
+}
+
+    /* Links im Header */
+    .top-row ::deep a,
+    .top-row ::deep .btn-link {
+        white-space: nowrap;
+        margin-left: 1.5rem;
+        text-decoration: none;
+    }
+
+        .top-row ::deep a:hover,
+        .top-row ::deep .btn-link:hover {
+            text-decoration: underline;
+        }
+
+        .top-row ::deep a:first-child {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+/* Responsive (Mobile) */
+@media (max-width: 640.98px) {
+    .page {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        position: relative;
+    }
+
+    .top-row {
+        justify-content: space-between;
+    }
+
+        .top-row ::deep a,
+        .top-row ::deep .btn-link {
+            margin-left: 0;
+        }
+}
+
+/* Blazor Error UI */
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }

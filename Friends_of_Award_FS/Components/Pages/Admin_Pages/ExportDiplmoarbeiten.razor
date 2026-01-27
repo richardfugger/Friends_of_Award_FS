@@ -11,11 +11,20 @@
 @layout AdminLayout
 @inject IJSRuntime JS
 
-<h3>ExportDiplmoarbeiten</h3>
 
-<button class="btn btn-success" @onclick="DownloadExcel">
-    Ergebnisse als Excel exportieren
-</button>
+<AuthorizeView>
+    <Authorized>
+        <h3>ExportDiplmoarbeiten</h3>
+
+        <button class="btn btn-success" @onclick="DownloadExcel">
+            Ergebnisse als Excel exportieren
+        </button>
+    </Authorized>
+
+    <NotAuthorized>
+        <p>Weiterleitung...</p>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     private async Task DownloadExcel()
