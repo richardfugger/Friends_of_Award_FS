@@ -1,11 +1,14 @@
 ﻿@page "/adminlogin"
+
 @rendermode InteractiveServer
-@inject NavigationManager MyNavMgr
-@inject MyCustomAuthStateProvider? MyAuthStateProvider
+
 @using Friends_of_Award_FS_Lib
 @using Microsoft.AspNetCore.Components.Authorization
 @using Blazor_WithAuth_ForSWP5
 @using System.Security.Cryptography
+
+@inject NavigationManager MyNavMgr
+@inject MyCustomAuthStateProvider? MyAuthStateProvider
 
 <PageTitle>AdminLogin</PageTitle>
 <div class="login-wrapper">

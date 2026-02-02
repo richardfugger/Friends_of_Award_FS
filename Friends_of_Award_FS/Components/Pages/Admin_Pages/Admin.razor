@@ -33,11 +33,20 @@
                 <div class="stat-card">
                     <div class="stat-icon">🔑</div>
                     <div class="stat-content">
-                        <span class="stat-label">Ungenutzte QR-Tokens</span>
+                        <span class="stat-label">Verfügbare QR-Tokens</span>
                         <span class="stat-value">@unusedTokens</span>
                     </div>
                 </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🗳️</div>
+                    <div class="stat-content">
+                        <span class="stat-label">Stimmabgaben</span>
+                        <span class="stat-value">@votedTokens</span>
+                    </div>
+                </div>
             </div>
+
 
 
             <div class="dashboard-content">
@@ -106,16 +115,20 @@
 @code {
     private List<Ergebnis>? ergebnisse;
     private int unusedTokens = 0;
+    private int votedTokens = 0;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadErgebnisse();
         await LoadCountUnusedToken();
+        await LoadCountVotedToken();
     }
 
     private async Task ReloadErgebnisse()
     {
         await LoadErgebnisse();
+        await LoadCountUnusedToken();
+        await LoadCountVotedToken();
     }
 
     private async Task LoadErgebnisse()
@@ -128,5 +141,10 @@
     private async Task LoadCountUnusedToken()
     {
         unusedTokens = TokenService.LoadCountUnusedTokens();
+    }
+
+    private async Task LoadCountVotedToken()
+    {
+        votedTokens = TokenService.LoadCountVotedTokens();
     }
 }

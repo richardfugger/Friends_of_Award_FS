@@ -167,7 +167,7 @@ namespace Friends_of_Award_FS_Lib.Services
             return success;
         }
     
-        public static int LoadCountUnusedTokens()
+        public int LoadCountUnusedTokens()
         {
             DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
 
@@ -184,5 +184,21 @@ namespace Friends_of_Award_FS_Lib.Services
             return unusedToken;
         }
     
+        public int LoadCountVotedTokens()
+        {
+            DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
+
+            string sql = "SELECT COUNT(*) FROM foa_qr_tokens WHERE voted = 1";
+
+            var result = wrappr.RunQueryScalar(sql);
+
+            if (result == null)
+                return 0;
+
+            if (!int.TryParse(result.ToString(), out int votedTokens))
+                return 0;
+
+            return votedTokens;
+        }
     }
 }

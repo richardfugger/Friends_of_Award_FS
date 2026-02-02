@@ -29,7 +29,6 @@
                          class="qr-image" />
 
                     <button @onclick="Next">Nächster Code</button>
-                    <button @onclick="NavigateToAmdinPage">Back</button>
                 }
                 else
                 {
@@ -93,10 +92,5 @@
             errormessage = "No more QR-Codes availiable.";
         }
 
-    }
-
-    private void NavigateToAmdinPage()
-    {
-        Nav.NavigateTo("/admin");
     }
 }

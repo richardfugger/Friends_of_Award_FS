@@ -10,7 +10,7 @@
 /* Header: Welcome + Statistik nebeneinander */
 .dashboard-header {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr 1.5fr 1.5fr;
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
@@ -131,8 +131,9 @@ tbody tr:nth-child(even) {
     }
 
 /* Responsive */
-@media (max-width: 900px) {
+@media (max-width: 600px) {
     .dashboard-header {
         grid-template-columns: 1fr;
     }
 }
+

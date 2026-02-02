@@ -1,14 +1,20 @@
 ﻿@page "/admin/import"
+
+@rendermode InteractiveServer
+
 @using Blazor_WithAuth_ForSWP5
 @using Friends_of_Award_FS.Components.Layout
 @using Friends_of_Award_FS_Lib.Services
-@rendermode InteractiveServer
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Authorization
+
 @inject NavigationManager MyNavMgr
 @inject MyCustomAuthStateProvider? MyAuthStateProvider
 @inject DiplomarbeitenService DaService
+
 @layout AdminLayout
+
+
 
 <AuthorizeView>
     <Authorized>
