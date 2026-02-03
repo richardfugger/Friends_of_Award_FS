@@ -15,12 +15,22 @@
     margin-bottom: 2rem;
 }
 
+    /* WICHTIG: erlaubt dem Grid schmaler zu werden */
+    .dashboard-header > * {
+        min-width: 0;
+    }
+
 .welcome-card {
     background: #1f2937;
     color: white;
     padding: 1.5rem;
     border-radius: 12px;
 }
+
+    /* lange Namen/Mails umbrechen */
+    .welcome-card h2 {
+        overflow-wrap: anywhere;
+    }
 
 /* Statistik-Kachel */
 .stat-card {
@@ -136,4 +146,3 @@ tbody tr:nth-child(even) {
         grid-template-columns: 1fr;
     }
 }
-

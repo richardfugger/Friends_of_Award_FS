@@ -60,8 +60,10 @@
 /* Main Content */
 main {
     flex: 1;
+    min-width: 0;
     padding: 1rem;
 }
+
 
 /* Top Row (Header in Sidebar) */
 .top-row {

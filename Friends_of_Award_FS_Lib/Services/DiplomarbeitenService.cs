@@ -170,31 +170,100 @@ new(StringComparer.OrdinalIgnoreCase)
         ORDER BY e.Punkte DESC;
     ";
 
-            DataTable table = DbWrapperMySqlV2.Wrapper.RunQuery(sql);
-
-            var result = new List<Ergebnis>();
-
-            foreach (DataRow row in table.Rows)
+            try
             {
-                var diplomarbeit = new Diplomarbeit(
-                    nr: Convert.ToInt32(row["Nr"]),
-                    abteilungsKuerzel: row["AbteilungKuerzel"].ToString()!,
-                    titel: row["Titel"].ToString()!,
-                    autoren: row["Autoren"].ToString()!
-                );
+                DataTable table = DbWrapperMySqlV2.Wrapper.RunQuery(sql);
 
-                var ergebnis = new Ergebnis(
-                    ergebnisID: Convert.ToInt32(row["ErgebnisID"]),
-                    diplomarbeitNr: Convert.ToInt32(row["DiplomarbeitNr"]),
-                    diplomarbeit: diplomarbeit,
-                    punkte: Convert.ToInt32(row["Punkte"])
-                );
+                var result = new List<Ergebnis>();
 
-                result.Add(ergebnis);
+                foreach (DataRow row in table.Rows)
+                {
+                    var diplomarbeit = new Diplomarbeit(
+                        nr: Convert.ToInt32(row["Nr"]),
+                        abteilungsKuerzel: row["AbteilungKuerzel"].ToString()!,
+                        titel: row["Titel"].ToString()!,
+                        autoren: row["Autoren"].ToString()!
+                    );
+
+                    var ergebnis = new Ergebnis(
+                        ergebnisID: Convert.ToInt32(row["ErgebnisID"]),
+                        diplomarbeitNr: Convert.ToInt32(row["DiplomarbeitNr"]),
+                        diplomarbeit: diplomarbeit,
+                        punkte: Convert.ToInt32(row["Punkte"])
+                    );
+
+                    result.Add(ergebnis);
+                }
+
+                return result;
             }
-
-            return result;
+            catch
+            {
+                return new();
+            }
         }
 
+
+        public List<(int, string)> GetDiplomarbeitForVoting()
+        {
+            string sql = @"
+        SELECT 
+            Nr, Titel
+        FROM foa_diplomarbeiten
+    ";
+            try
+            {
+                DataTable table = DbWrapperMySqlV2.Wrapper.RunQuery(sql);
+
+                var result = new List<(int, string)>();
+
+                foreach (DataRow row in table.Rows)
+                {
+                    int nr = Convert.ToInt32(row["Nr"]);
+                    string titel = row["Titel"].ToString()!;
+
+                    result.Add((nr, titel));
+                }
+
+                return result;
+            }
+            catch
+            {
+                return new();
+            }
+        }
+    
+    
+        public bool SendVote(HashSet<int> favoriteIds, int? topFavoriteId)
+        {
+            string sql = @"
+        INSERT INTO foa_ergebnisse (DiplomarbeitNr, Punkte)
+        VALUES ({0}, {1})
+        ON DUPLICATE KEY UPDATE
+            Punkte = Punkte + {1};
+    ";
+
+            try
+            {
+                foreach (int id in favoriteIds)
+                {
+                    string formattedSql = string.Format(sql, id, 1);
+                    DbWrapperMySqlV2.Wrapper.RunNonQuery(formattedSql);
+                }
+
+                // TopFavourite immer extra: +2 Punkte
+                if (topFavoriteId.HasValue)
+                {
+                    string formattedSql = string.Format(sql, topFavoriteId.Value, 2);
+                    DbWrapperMySqlV2.Wrapper.RunNonQuery(formattedSql);
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }
