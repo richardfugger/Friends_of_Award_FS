@@ -141,3 +141,32 @@
     margin-top: 1rem;
 }
 
+
+.page-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 16px; /* Abstand links & rechts */
+}
+
+/* Für kleine Displays (Handy) */
+@media (max-width: 600px) {
+    .page-wrapper {
+        padding: 20px 14px; /* mehr Luft am Rand */
+    }
+
+    .button-grid {
+        grid-template-columns: repeat(3, 1fr); /* statt 4 Spalten */
+        gap: 10px;
+    }
+
+    .number-button {
+        font-size: 1.1rem;
+        padding: 12px 0;
+    }
+
+    .title-main {
+        font-size: 1.8rem;
+    }
+}
+
+

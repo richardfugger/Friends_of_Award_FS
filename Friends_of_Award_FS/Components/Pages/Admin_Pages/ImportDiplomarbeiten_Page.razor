@@ -41,7 +41,7 @@
                     <InputFile id="excelUpload"
                                OnChange="OnFileSelected"
                                accept=".xlsx"
-                               class="file-input" />
+                               style="display:none" />
 
                     <label for="excelUpload" class="file-button">
                         📂 Excel-Datei auswählen
@@ -51,6 +51,8 @@
                     {
                         <div class="file-name">Ausgewählt: @SelectedFileName</div>
                     }
+
+
                 </form>
 
                 @if (!string.IsNullOrEmpty(Status))
@@ -67,6 +69,33 @@
                         }
                     </ul>
                 }
+
+                @if (ShowConfirm)
+                {
+                    <div class="modal-backdrop">
+                        <div class="modal-card">
+                            <h3>⚠️ Import bestätigen</h3>
+
+                            <p>
+                                Soll die Datei <b>@SelectedFileName</b> wirklich importiert werden?
+                            </p>
+                            <p>
+                                <b>Alle bestehenden Einträge werden überschrieben!</b>
+                            </p>
+
+                            <div class="modal-actions">
+                                <button class="file-button" @onclick="ConfirmImport">
+                                    ✅ Ja, importieren
+                                </button>
+
+                                <button class="cancel-button" @onclick="CancelImport">
+                                    ❌ Abbrechen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+
             </div>
 
         </div>
@@ -79,22 +108,51 @@
 
 
 @code {
-    string? Status;
     List<string> Errors = new();
     string? SelectedFileName;
 
+    string? Status;
+
+    IBrowserFile? SelectedFile;
+    bool ShowConfirm = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        var uri = MyNavMgr.ToAbsoluteUri(MyNavMgr.Uri);
+
+        var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
+        var user = state.User;
+
+        if (!user.Identity!.IsAuthenticated)
+        {
+            MyNavMgr.NavigateTo("/adminlogin", true);
+        }
+    }
+
     async Task OnFileSelected(InputFileChangeEventArgs e)
     {
+        SelectedFile = e.File;
         SelectedFileName = e.File.Name;
 
-        Console.WriteLine("[Import Page] Method enetred");
-
+        ShowConfirm = true;
+        Status = null;
         Errors.Clear();
+    }
+
+    async Task ConfirmImport()
+    {
+        if (SelectedFile == null)
+            return;
+
         Status = "Import läuft...";
+        Errors.Clear();
 
         try
         {
-            await using var uploadStream = e.File.OpenReadStream(10 * 1024 * 1024);
+            await using var uploadStream = SelectedFile.OpenReadStream(10 * 1024 * 1024);
             using var ms = new MemoryStream();
 
             await uploadStream.CopyToAsync(ms);
@@ -112,20 +170,19 @@
             Status = "Fehler beim Import.";
             Errors.Add(ex.Message);
         }
+        finally
+        {
+            ShowConfirm = false;
+        }
+
     }
 
-   /* protected override async Task OnAfterRenderAsync(bool firstRender)
+    void CancelImport()
     {
-        if (firstRender)
-        {
-            var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
-            var user = state.User;
-
-            if (!user.Identity.IsAuthenticated)
-            {
-                MyNavMgr.NavigateTo("/adminlogin", true);
-            }
-        }
-    }*/
+        SelectedFile = null;
+        SelectedFileName = null;
+        ShowConfirm = false;
+        Status = "Import abgebrochen.";
+    }
 
 }

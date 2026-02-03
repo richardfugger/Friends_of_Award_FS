@@ -158,16 +158,16 @@ new(StringComparer.OrdinalIgnoreCase)
             string sql = @"
         SELECT 
             e.ErgebnisID,
-            e.DiplomarbeitNr,
-            e.Punkte,
+            d.Nr AS DiplomarbeitNr,
+            COALESCE(e.Punkte, 0) AS Punkte,
             d.Nr,
             d.AbteilungKuerzel,
             d.Titel,
             d.Autoren
-        FROM foa_ergebnisse e
-        JOIN foa_diplomarbeiten d 
+        FROM foa_diplomarbeiten d
+        LEFT JOIN foa_ergebnisse e 
             ON e.DiplomarbeitNr = d.Nr
-        ORDER BY e.Punkte DESC;
+        ORDER BY Punkte DESC;
     ";
 
             try
@@ -186,7 +186,7 @@ new(StringComparer.OrdinalIgnoreCase)
                     );
 
                     var ergebnis = new Ergebnis(
-                        ergebnisID: Convert.ToInt32(row["ErgebnisID"]),
+                        ergebnisID: row["ErgebnisID"] == DBNull.Value ? 0 : Convert.ToInt32(row["ErgebnisID"]),
                         diplomarbeitNr: Convert.ToInt32(row["DiplomarbeitNr"]),
                         diplomarbeit: diplomarbeit,
                         punkte: Convert.ToInt32(row["Punkte"])

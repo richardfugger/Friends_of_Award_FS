@@ -9,12 +9,14 @@
 @inject MyCustomAuthStateProvider? MyAuthStateProvider
 @inject NavigationManager MyNavMgr
 @inject DiplomarbeitenService DaService
+@inject TokenService TokenService
 
 <PageTitle>Home</PageTitle>
 
-@*
+
 <AuthorizeView>
     <Authorized>
+        <div class="page-wrapper">
         <h3>Willkommen</h3>
 
         <h1 class="title-main">Friends of Award</h1>
@@ -45,33 +47,55 @@
         </div>
 
         <p class="status">
-            Offen: @RemainingFavorites Favoriten, @RemainingTop Topfavorit
+            Offen: @remainingFavorites Favoriten, @remainingTopFavorite Topfavorit
         </p>
 
         <div class="submit-container">
-            <button class="submit-button">
+            <button class="submit-button" @onclick="Btn_BewertungAbsenden">
                 Bewertung absenden
             </button>
         </div>
 
-        <button class="home-button" @onclick="ToggleAdmin">
-            🏠
-        </button>
 
-        <style>
-            body {
-                font-family: Arial;
+        @if (hasSubmitted)
+        {
+            @switch (status)
+            {
+                case Status.Success:
+                    <p class="success-text">
+                        ✅ Vielen Dank! Ihre Bewertung wurde gespeichert.
+                    </p>
+                    break;
+
+                case Status.AlreadyVoted:
+                    <p class="error-text">
+                        ⚠️ Sie haben bereits abgestimmt. Mehrfaches Abstimmen ist nicht erlaubt.
+                    </p>
+                    break;
+
+                case Status.NothingSelected:
+                    <p class="error-text">
+                        ⚠️ Bitte wählen Sie mindestens einen Favoriten oder einen Topfavoriten aus.
+                    </p>
+                    break;
+
+                case Status.OtherError:
+                    <p class="error-text">
+                        ❌ Fehler beim Speichern der Bewertung.
+                    </p>
+                    break;
             }
-        </style>
+        }
+        </div>
+
     </Authorized>
 
     <NotAuthorized>
         <p>Weiterleitung...</p>
     </NotAuthorized>
 </AuthorizeView>
-*@
 
-
+@*
 <h3>Willkommen</h3>
 
 <h1 class="title-main">Friends of Award</h1>
@@ -123,8 +147,7 @@
         <p class="error-text">❌ Fehler beim Speichern der Bewertung.</p>
     }
 }
-
-
+*@
 
 @code {
     private List<(int, string)> diplomarbeiten = new();
@@ -137,7 +160,9 @@
     private int remainingTopFavorite => topFavorite == null ? 1 : 0;
 
     private bool success;
+    private Status status;
     private bool hasSubmitted = false;
+    private bool isAllowedToVote = false;
 
 
 
@@ -152,7 +177,7 @@
         return DaService.GetDiplomarbeitForVoting();
     }
 
-    /*protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
             return;
@@ -178,11 +203,11 @@
         {
             MyNavMgr.NavigateTo("/adminlogin", true);
         }
-    }*/
+    }
 
     private void Logout()
     {
-        ((MyCustomAuthStateProvider)MyAuthStateProvider).Logout();
+        MyAuthStateProvider.Logout();
         MyNavMgr.NavigateTo("/");
     }
 
@@ -231,20 +256,54 @@
     }
 
 
-    private void Btn_BewertungAbsenden()
+    private async Task Btn_BewertungAbsenden()
     {
         hasSubmitted = true;
+        var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
+        var username = state.User.Identity?.Name;
+
+        if (!string.IsNullOrEmpty(username))
+        {
+            isAllowedToVote = TokenService.IsUserAllowedToVote(username);
+        }
+        else
+        {
+            return;
+        }
+
+        if(!isAllowedToVote)
+        {
+            status = Status.AlreadyVoted;
+            return;
+        }
+
 
         if (favorites.Count < 1 && topFavorite == null)
         {
-            success = false;
+            status = Status.NothingSelected;
+            return;
         }
         success = DaService.SendVote(favorites, topFavorite);
         if (success)
         {
+            status = Status.Success;
+            TokenService.MarkAsVoted(username);
             favorites.Clear();
             topFavorite = null;
         }
+        else
+        {
+            status = Status.OtherError;
+        }
+
     }
 
+
+    enum Status
+    {
+        Success,
+        AlreadyVoted,
+        NothingSelected,
+        OtherError
+    }
 }

@@ -9,7 +9,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using QRCoder
 
-@inject NavigationManager Nav
+@inject NavigationManager MyNavMgr
 @inject MyCustomAuthStateProvider? MyAuthStateProvider
 @inject TokenService TokenService
 
@@ -53,11 +53,29 @@
     private string? qrImageBase64;
     private string errormessage = "";
 
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        var uri = MyNavMgr.ToAbsoluteUri(MyNavMgr.Uri);
+
+        var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
+        var user = state.User;
+
+        if (!user.Identity!.IsAuthenticated)
+        {
+            MyNavMgr.NavigateTo("/adminlogin", true);
+        }
+    }
+
     protected override void OnInitialized()
     {
         unusedTokenList = TokenService.LoadTokenFromDb();
         LoadNextQr();
     }
+
 
     private void LoadNextQr()
     {
@@ -67,7 +85,7 @@
             return;
         }
 
-        string url = $"{Nav.BaseUri.TrimEnd('/')}/qr-login?token={unusedTokenList[^1]}";
+        string url = $"{MyNavMgr.BaseUri.TrimEnd('/')}/qr-login?token={unusedTokenList[^1]}";
 
         Console.WriteLine($"[QRCODE]: {url}");
         Console.WriteLine($"[QRCODE] Showing token: {unusedTokenList[^1]}");

@@ -50,17 +50,19 @@
         await JS.InvokeVoidAsync("downloadFile", "Ergebnisse.xlsx", bytes);
     }
 
-    @*protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
-            var user = state.User;
+        if (!firstRender)
+            return;
 
-            if (!user.Identity.IsAuthenticated)
-            {
-                MyNavMgr.NavigateTo("/adminlogin", true);
-            }
+        var uri = MyNavMgr.ToAbsoluteUri(MyNavMgr.Uri);
+
+        var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
+        var user = state.User;
+
+        if (!user.Identity!.IsAuthenticated)
+        {
+            MyNavMgr.NavigateTo("/adminlogin", true);
         }
-    }*@
+    }
 }

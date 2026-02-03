@@ -200,5 +200,23 @@ namespace Friends_of_Award_FS_Lib.Services
 
             return votedTokens;
         }
+    
+        public bool IsUserAllowedToVote(string token)
+        {
+            DbWrapperMySqlV2 wrappr = DbWrapperMySqlV2.Wrapper;
+
+            string sql = $"""
+        SELECT COUNT(*) 
+        FROM foa_qr_tokens 
+        WHERE token = '{token}'
+        AND voted = 0
+    """;
+
+            var result = wrappr.RunQueryScalar(sql);
+
+            Console.WriteLine($"[TOKEN CHECK] token={token}, exists={result}");
+
+            return Convert.ToInt32(result) == 1;
+        }
     }
 }
