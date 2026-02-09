@@ -47,15 +47,18 @@
     transition: 0.2s;
 }
 
+
     .number-button:hover {
         background-color: #d6d6d6;
     }
+
 
     .number-button.favorite {
         background-color: #4caf50; /* grün */
         color: white;
         font-weight: bold;
     }
+
 
     .number-button.topfavorite {
         background-color: #ffa726; /* orange */
@@ -87,12 +90,12 @@
     transition: background-color 0.2s ease;
 }
 
+
     .submit-button:hover {
         background-color: #1e88e5;
     }
 
-/* Admin-Panel oben wie im 2. Bild */
-.admin-panel {
+/* Admin-Panel oben wie im 2. Bild */ .admin-panel {
     max-width: 900px;
     margin: 20px auto;
     background-color: #ffffff;
@@ -112,12 +115,12 @@
     gap: 8px;
 }
 
+
     .admin-row label {
         min-width: 90px;
     }
 
-/* Haus-Button unten rechts */
-.home-button {
+/* Haus-Button unten rechts */ .home-button {
     position: fixed;
     bottom: 8px;
     right: 8px;
@@ -128,45 +131,3 @@
     line-height: 1;
     padding: 0;
 }
-
-.success-text {
-    color: green;
-    font-weight: bold;
-    margin-top: 1rem;
-}
-
-.error-text {
-    color: red;
-    font-weight: bold;
-    margin-top: 1rem;
-}
-
-
-.page-wrapper {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 16px; /* Abstand links & rechts */
-}
-
-/* Für kleine Displays (Handy) */
-@media (max-width: 600px) {
-    .page-wrapper {
-        padding: 20px 14px; /* mehr Luft am Rand */
-    }
-
-    .button-grid {
-        grid-template-columns: repeat(3, 1fr); /* statt 4 Spalten */
-        gap: 10px;
-    }
-
-    .number-button {
-        font-size: 1.1rem;
-        padding: 12px 0;
-    }
-
-    .title-main {
-        font-size: 1.8rem;
-    }
-}
-
-
