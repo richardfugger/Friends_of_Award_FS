@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace Friends_of_Award_FS_Lib
+namespace Friends_of_Award_FS_Lib.Models
 {
     public class Admin
     {
@@ -21,7 +21,7 @@ namespace Friends_of_Award_FS_Lib
 
             try
             {
-                string sql = $"SELECT email, password FROM foaadmins";
+                string sql = $"SELECT email, password FROM foa_admins";
                 dt = wrappr.RunQuery(sql);
                 foreach (DataRow dr in dt.Rows)
                 {

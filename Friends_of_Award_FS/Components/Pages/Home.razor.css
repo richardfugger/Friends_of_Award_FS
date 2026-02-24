@@ -47,15 +47,18 @@
     transition: 0.2s;
 }
 
+
     .number-button:hover {
         background-color: #d6d6d6;
     }
+
 
     .number-button.favorite {
         background-color: #4caf50; /* grün */
         color: white;
         font-weight: bold;
     }
+
 
     .number-button.topfavorite {
         background-color: #ffa726; /* orange */
@@ -87,12 +90,12 @@
     transition: background-color 0.2s ease;
 }
 
+
     .submit-button:hover {
         background-color: #1e88e5;
     }
 
-/* Admin-Panel oben wie im 2. Bild */
-.admin-panel {
+/* Admin-Panel oben wie im 2. Bild */ .admin-panel {
     max-width: 900px;
     margin: 20px auto;
     background-color: #ffffff;
@@ -112,12 +115,12 @@
     gap: 8px;
 }
 
+
     .admin-row label {
         min-width: 90px;
     }
 
-/* Haus-Button unten rechts */
-.home-button {
+/* Haus-Button unten rechts */ .home-button {
     position: fixed;
     bottom: 8px;
     right: 8px;
@@ -127,4 +130,29 @@
     font-size: 26px;
     line-height: 1;
     padding: 0;
+}
+
+.lp-tooltip {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 90vw;
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-size: 14px;
+    z-index: 9999;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    pointer-events: none;
+    text-align: center;
+}
+
+.number-button {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
 }

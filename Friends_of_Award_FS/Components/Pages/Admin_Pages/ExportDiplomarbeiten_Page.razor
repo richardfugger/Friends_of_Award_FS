@@ -1,0 +1,68 @@
+﻿@page "/admin/export"
+
+@rendermode InteractiveServer
+
+@using Blazor_WithAuth_ForSWP5
+@using Friends_of_Award_FS.Components.Layout
+@using Friends_of_Award_FS_Lib.Services
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject NavigationManager MyNavMgr
+@inject MyCustomAuthStateProvider? MyAuthStateProvider
+@inject DiplomarbeitenService DaService
+@inject IJSRuntime JS
+
+@layout AdminLayout
+
+
+<AuthorizeView>
+    <Authorized>
+        <div class="export-page">
+
+            <div class="export-card">
+                <div class="export-icon">📤</div>
+
+                <h2>Ergebnisse exportieren</h2>
+                <p class="export-description">
+                    Hier kannst du alle ausgewerteten Diplomarbeiten als Excel-Datei herunterladen.
+                </p>
+
+                <button class="btn btn-primary export-button" @onclick="DownloadExcel">
+                    📊 Excel-Datei herunterladen
+                </button>
+            </div>
+
+        </div>
+    </Authorized>
+
+    <NotAuthorized>
+        <p>Weiterleitung...</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code {
+    private async Task DownloadExcel()
+    {
+        Console.WriteLine("Download Methode aufgerufen");
+        var bytes = DaService.ExportErgebnisseToExcel();
+        await JS.InvokeVoidAsync("downloadFile", "Ergebnisse.xlsx", bytes);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        var uri = MyNavMgr.ToAbsoluteUri(MyNavMgr.Uri);
+
+        var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
+        var user = state.User;
+
+        if (!user.Identity!.IsAuthenticated)
+        {
+            MyNavMgr.NavigateTo("/adminlogin", true);
+        }
+    }
+}

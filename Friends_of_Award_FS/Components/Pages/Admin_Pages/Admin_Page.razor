@@ -1,0 +1,169 @@
+﻿@page "/admin"
+
+@rendermode InteractiveServer
+
+@using Blazor_WithAuth_ForSWP5
+@using Friends_of_Award_FS.Components.Layout
+@using Friends_of_Award_FS_Lib.Models
+@using Friends_of_Award_FS_Lib.Services
+@using Microsoft.AspNetCore.Components.Authorization
+
+@layout AdminLayout
+
+@inject MyCustomAuthStateProvider MyAuthStateProvider
+@inject NavigationManager MyNavMgr
+@inject DiplomarbeitenService DaService
+@inject TokenService TokenService
+
+
+<section class="admin-dashboard">
+    <h1 class="dashboard-title">Admin Dashboard</h1>
+
+    <AuthorizeView>
+        <Authorized>
+            @{
+                string name = context.User.Identity?.Name ?? "Admin";
+            }
+
+            <div class="dashboard-header">
+                <div class="welcome-card">
+                    <h2>Willkommen @name</h2>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🔑</div>
+                    <div class="stat-content">
+                        <span class="stat-label">Verfügbare QR-Tokens</span>
+                        <span class="stat-value">@unusedTokens</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🗳️</div>
+                    <div class="stat-content">
+                        <span class="stat-label">Stimmabgaben</span>
+                        <span class="stat-value">@votedTokens</span>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="dashboard-content">
+                <div class="card">
+                    <h3>Aktueller Stand</h3>
+
+                    @if (ergebnisse == null)
+                    {
+                        <div class="status loading">Daten werden geladen…</div>
+                    }
+                    else if (ergebnisse.Count == 0)
+                    {
+                        <div class="status empty">Keine Diplomarbeiten in Datenbank vorhanden.</div>
+                    }
+                    else
+                    {
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Platz</th>
+                                        <th>Abteilung</th>
+                                        <th>Titel</th>
+                                        <th>Autoren</th>
+                                        <th>Punkte</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        int platz = 1;
+                                    }
+                                    @foreach (var e in ergebnisse)
+                                    {
+                                        <tr>
+                                            <td>@platz</td>
+                                            <td>@e.Diplomarbeit.AbteilungsKuerzel</td>
+                                            <td>@e.Diplomarbeit.Titel</td>
+                                            <td>@e.Diplomarbeit.Autoren</td>
+                                            <td class="punkte">@e.Punkte</td>
+                                        </tr>
+
+                                        platz++;
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+
+                <div class="reload-container">
+                    <button class="btn-reload-large" @onclick="ReloadErgebnisse">
+                        🔄 Ergebnisse neu laden
+                    </button>
+                </div>
+
+            </div>
+        </Authorized>
+
+        <NotAuthorized>
+            <div class="status forbidden">
+                Zugriff verweigert – du wirst weitergeleitet…
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+</section>
+
+
+
+@code {
+    private List<Ergebnis>? ergebnisse;
+    private int unusedTokens = 0;
+    private int votedTokens = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadErgebnisse();
+        await LoadCountUnusedToken();
+        await LoadCountVotedToken();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        var uri = MyNavMgr.ToAbsoluteUri(MyNavMgr.Uri);
+
+        var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
+        var user = state.User;
+
+        if (!user.Identity!.IsAuthenticated)
+        {
+            MyNavMgr.NavigateTo("/adminlogin", true);
+        }
+    }
+
+    private async Task ReloadErgebnisse()
+    {
+        await LoadErgebnisse();
+        await LoadCountUnusedToken();
+        await LoadCountVotedToken();
+    }
+
+    private async Task LoadErgebnisse()
+    {
+        ergebnisse = null;
+        await Task.Delay(100);
+        ergebnisse = DaService.GetDiplomarbeitenPlusErgebnis();
+    }
+
+    private async Task LoadCountUnusedToken()
+    {
+        unusedTokens = TokenService.LoadCountUnusedTokens();
+    }
+
+    private async Task LoadCountVotedToken()
+    {
+        votedTokens = TokenService.LoadCountVotedTokens();
+    }
+}

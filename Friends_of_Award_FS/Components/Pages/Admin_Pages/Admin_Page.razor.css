@@ -1,0 +1,157 @@
+﻿.admin-dashboard {
+    padding: 2rem;
+}
+
+.dashboard-title {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Header: Welcome + Statistik nebeneinander */
+.dashboard-header {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+    /* WICHTIG: erlaubt dem Grid schmaler zu werden */
+    .dashboard-header > * {
+        min-width: 0;
+    }
+
+.welcome-card {
+    background: #1f2937;
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+}
+
+    /* lange Namen/Mails umbrechen */
+    .welcome-card h2 {
+        overflow-wrap: anywhere;
+    }
+
+/* Statistik-Kachel */
+.stat-card {
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    opacity: 0.9;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    opacity: 0.85;
+}
+
+.stat-value {
+    font-size: 2.2rem;
+    font-weight: bold;
+}
+
+/* Haupt-Card (Tabelle) */
+.dashboard-content .card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.card h3 {
+    margin-bottom: 1rem;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #f3f4f6;
+}
+
+th, td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+}
+
+tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+.punkte {
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Statusboxen */
+.status {
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+    .status.loading {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
+
+    .status.empty {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status.forbidden {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+/* Großer Reload Button unterhalb */
+.reload-container {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-reload-large {
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(37,99,235,0.3);
+    transition: all 0.2s ease;
+}
+
+    .btn-reload-large:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(37,99,235,0.4);
+    }
+
+/* Responsive */
+@media (max-width: 600px) {
+    .dashboard-header {
+        grid-template-columns: 1fr;
+    }
+}

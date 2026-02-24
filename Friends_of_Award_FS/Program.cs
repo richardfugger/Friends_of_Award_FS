@@ -1,5 +1,6 @@
 using Blazor_WithAuth_ForSWP5;
 using Friends_of_Award_FS.Components;
+using Friends_of_Award_FS_Lib.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,8 +14,14 @@ builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<MyCustomAuthStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
   provider.GetRequiredService<MyCustomAuthStateProvider>());
+builder.Services.AddScoped<DiplomarbeitenService>();
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddSingleton<VotingConfigService>();
+
 
 var app = builder.Build();
+
+app.UseStaticFiles();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

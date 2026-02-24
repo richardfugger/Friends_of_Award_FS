@@ -1,9 +1,14 @@
 ﻿@page "/qr-login"
+
 @rendermode InteractiveServer
+
 @using Blazor_WithAuth_ForSWP5
 @using Friends_of_Award_FS_Lib
+@using Friends_of_Award_FS_Lib.Services
+
 @inject NavigationManager MyNavMgr
 @inject MyCustomAuthStateProvider? MyAuthStateProvider
+@inject TokenService TokenService
 
 <h3>QrCode_Login_Page</h3>
 
@@ -19,30 +24,37 @@
     private string? error = "";
     private bool tokenIsInvalid = true;
 
-    protected override void OnInitialized()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        if (!firstRender)
+            return;
+
         var uri = MyNavMgr.ToAbsoluteUri(MyNavMgr.Uri);
 
-        if (Microsoft.AspNetCore.WebUtilities.QueryHelpers
-            .ParseQuery(uri.Query)
-            .TryGetValue("token", out var tokenValue))
-        {
-            token = tokenValue;
-            tokenIsInvalid = Token.CheckTokenUniqueness(token);
+        Console.WriteLine($"[QR LOGIN] URL = {uri}");
+        
 
-            if(tokenIsInvalid)
-            {
-                error = "Token is not valid.";
-            }
-            else
-            {
-                MyAuthStateProvider.Login(token);
-                MyNavMgr.NavigateTo("/");
-            }
-        }
-        else
+        if (!Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query)
+            .TryGetValue("token", out var token))
         {
-            error = "No Token found.";
+            error = "No token found.";
+            Console.WriteLine($"[QR LOGIN] No token found");
+            StateHasChanged();
+            return;
         }
+
+        Console.WriteLine($"[QR LOGIN] Token received = {token}");
+        var valid = TokenService.IsValidUnusedToken(token);
+
+        if (!valid)
+        {
+            error = "Invalid token.";
+            StateHasChanged();
+            return;
+        }
+
+        MyAuthStateProvider.Login(token);
+        MyNavMgr.NavigateTo("/");
     }
+
 }

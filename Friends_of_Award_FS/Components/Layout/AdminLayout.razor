@@ -1,0 +1,49 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+        <nav class="flex-column">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin" Match="NavLinkMatch.All">
+                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span>
+                    Dashboard
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin/qrcodegeneration">
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span>
+                    QR Codes Generieren
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin/qrcodes">
+                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span>
+                    QR Codes Anzeigen
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin/import">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span>
+                    Import Excelliste
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin/export">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span>
+                    Export Excelliste
+                </NavLink>
+            </div>
+        </nav>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        @Body
+    </main>
+</div>

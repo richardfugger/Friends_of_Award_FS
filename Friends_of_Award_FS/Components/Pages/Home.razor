@@ -1,15 +1,112 @@
 ﻿@page "/"
+
 @rendermode InteractiveServer
+
 @using Blazor_WithAuth_ForSWP5
+@using Friends_of_Award_FS_Lib.Services
 @using Microsoft.AspNetCore.Components.Authorization
+
 @inject MyCustomAuthStateProvider? MyAuthStateProvider
 @inject NavigationManager MyNavMgr
+@inject DiplomarbeitenService DaService
+@inject TokenService TokenService
+@inject VotingConfigService VotingConfig
 
 <PageTitle>Home</PageTitle>
 
+
 <AuthorizeView>
     <Authorized>
-        <h3>Willkommen</h3>
+        <div class="page-wrapper">
+            <h1 class="title-main">Friends of Award</h1>
+
+            <p class="subtitle">
+                Geben Sie uns Ihre persönlichen Favoriten bekannt!
+            </p>
+
+            <p class="instructions">
+                Einfacher Klick = Favorit (max. 5)<br />
+                Doppelklick = Topfavorit (max. 1)
+            </p>
+
+            <p class="note-text">
+                Diese Abstimmung ist anonym und auf ein Gerät beschränkt!
+            </p>
+
+            <div class="button-grid">
+                @foreach ((int nr, string titel) in diplomarbeiten)
+                {
+                    <button class="number-button @(GetButtonClass(nr)) lp-target"
+                            title="@titel"
+                            @onpointerdown="() => OnPressStart(titel)"
+                            @onpointerup="OnPressEnd"
+                            @onpointercancel="OnPressEnd"
+                            @onpointerleave="OnPressEnd"
+                            @onclick="() => ClickButton(nr)"
+                            @ondblclick="() => DoubleClickButton(nr)"
+                            disabled="@(!VotingConfig.IsVotingOpen())">
+                        @GetStars(nr) @nr
+                    </button>
+                }
+            </div>
+            @if (showLongPressTitle)
+            {
+                <div class="lp-tooltip">@longPressTitle</div>
+            }
+
+            <p class="status">
+                Offen: @remainingFavorites Favoriten, @remainingTopFavorite Topfavorit
+            </p>
+
+            <div class="submit-container">
+                <button class="submit-button" @onclick="Btn_BewertungAbsenden" disabled="@(!VotingConfig.IsVotingOpen())">
+                    Bewertung absenden
+                </button>
+            </div>
+            @if (!VotingConfig.IsVotingOpen())
+            {
+                <p class="error-text">
+                    ⛔ Die Abstimmung ist bereits beendet.
+                </p>
+            }
+
+            @if (hasSubmitted)
+            {
+                @switch (status)
+                {
+                    case Status.Success:
+                        <p class="success-text">
+                            ✅ Vielen Dank! Ihre Bewertung wurde gespeichert.
+                        </p>
+                        break;
+
+                    case Status.AlreadyVoted:
+                        <p class="error-text">
+                            ⚠️ Sie haben bereits abgestimmt. Mehrfaches Abstimmen ist nicht erlaubt.
+                        </p>
+                        break;
+
+                    case Status.NothingSelected:
+                        <p class="error-text">
+                            ⚠️ Bitte wählen Sie mindestens einen Favoriten oder einen Topfavoriten aus.
+                        </p>
+                        break;
+
+                    case Status.VotingClosed:
+                        <p class="error-text">
+                            ⛔ Die Abstimmung ist bereits beendet.
+                        </p>
+                        break;
+
+                    case Status.OtherError:
+                        <p class="error-text">
+                            ❌ Fehler beim Speichern der Bewertung.
+                        </p>
+                        break;
+                }
+            }
+        </div>
+
     </Authorized>
 
     <NotAuthorized>
@@ -17,129 +114,77 @@
     </NotAuthorized>
 </AuthorizeView>
 
-<h1 class="title-main">Friends of Award</h1>
-
-<p class="subtitle">
-    Geben Sie uns Ihre persönlichen Favoriten bekannt!
-</p>
-
-<p class="instructions">
-    Einfacher Klick = Favorit (max. 5)<br />
-    Doppelklick = Topfavorit (max. 1)
-</p>
-
-<p class="note-text">
-    Diese Abstimmung ist anonym und auf ein Gerät beschränkt!
-</p>
-
-<div class="button-grid">
-    @foreach (var da in Diplomarbeiten)
-    {
-        <button class="number-button @(GetButtonClass(da.Id))"
-                title="@da.Titel"
-                @onclick="() => ClickButton(da.Id)"
-                @ondblclick="() => DoubleClickButton(da.Id)">
-            @GetStars(da.Id) @da.Id
-        </button>
-    }
-</div>
-
-<p class="status">
-    Offen: @RemainingFavorites Favoriten, @RemainingTop Topfavorit
-</p>
-
-<div class="submit-container">
-    <button class="submit-button">
-        Bewertung absenden
-    </button>
-</div>
-
-@if (showAdmin)
-{
-    <div class="admin-panel">
-        <h2 class="admin-title">Adminbereich</h2>
-
-        <div class="admin-row">
-            <label for="adminCode">Admin-Code:</label>
-            <input id="adminCode" type="password" @bind="adminCode" />
-
-            <button @onclick="OnLogin">Anmelden</button>
-            <button @onclick="OnLogout">Abmelden</button>
-        </div>
-    </div>
-}
-
-<button class="home-button" @onclick="ToggleAdmin">
-    🏠
-</button>
-
-<style>
-    body {
-        font-family: Arial;
-    }
-</style>
 
 @code {
-    void Btn_Login() => MyNavMgr.NavigateTo("/Login");
-
-    void Btn_Logout()
-    {
-        MyAuthStateProvider?.Logout();
-    }
-
-    public class DiplomarbeitInfo
-    {
-        public int Id { get; set; }
-        public string Titel { get; set; } = string.Empty;
-    }
-
-    private List<string> Diplomarbeitstitel = new()
-    {
-        "Smart Home Monitoring System",
-        "KI-gestützte Bildauswertung",
-        "Mobile App für Schulorganisation",
-        "IoT Energieverbrauchsanalyse",
-        "Webplattform Event-Management",
-        "Autonomes Robotikfahrzeug",
-        "E-Learning Portal",
-        "3D-Drucker Monitoring",
-        "Smart Garden",
-        "Chatbot Schul-FAQ",
-        "RFID Zeiterfassung",
-        "VR Physik Lernapp",
-        "Coding Lernplattform",
-        "Ticket-System Schule",
-        "Smart Locker System",
-        "Verkehrsanalyse KI",
-        "Fitness Tracker BLE",
-        "Online-Abstimmungssystem",
-        "Raumbelegungsanzeige"
-    };
-
-    public List<DiplomarbeitInfo> Diplomarbeiten { get; set; } = new();
-
-    protected override void OnInitialized()
-    {
-        int idCounter = 1;
-        foreach (var titel in Diplomarbeitstitel)
-        {
-            Diplomarbeiten.Add(new DiplomarbeitInfo
-            {
-                Id = idCounter++,
-                Titel = titel
-            });
-        }
-    }
+    private List<(int, string)> diplomarbeiten = new();
 
     private int MaxFavorites = 5;
     private HashSet<int> favorites = new();
-    private int? topfavorite = null;
+    private int? topFavorite = null;
 
-    private int RemainingFavorites => MaxFavorites - favorites.Count;
-    private int RemainingTop => topfavorite == null ? 1 : 0;
+    private int remainingFavorites => MaxFavorites - favorites.Count;
+    private int remainingTopFavorite => topFavorite == null ? 1 : 0;
+
+    private bool success;
+    private Status status;
+    private bool hasSubmitted = false;
+    private bool isAllowedToVote = false;
+    private bool isVotingOpen;
+
+
+
+
+    protected override void OnInitialized()
+    {
+        diplomarbeiten = LoadDiplomarbeiten();
+        isVotingOpen = VotingConfig.IsVotingOpen();
+    }
+
+    private List<(int, string)> LoadDiplomarbeiten()
+    {
+        return DaService.GetDiplomarbeitForVoting();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        var uri = MyNavMgr.ToAbsoluteUri(MyNavMgr.Uri);
+
+        Console.WriteLine($"[HOME] URL: {uri}");
+        Console.WriteLine($"[HOME] HasToken: {uri.Query.Contains("token")}");
+
+        // Wenn Token vorhanden → Home greift NICHT ein
+        if (Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query)
+            .TryGetValue("token", out var tokenValue))
+        {
+            MyNavMgr.NavigateTo($"/qr-login?token={tokenValue}");
+            return;
+        }
+
+        // Nur normaler Auth-Check OHNE Token
+        var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
+        var user = state.User;
+
+        if (!user.Identity!.IsAuthenticated)
+        {
+            MyNavMgr.NavigateTo("/adminlogin", true);
+        }
+    }
+
+    private void Logout()
+    {
+        MyAuthStateProvider.Logout();
+        MyNavMgr.NavigateTo("/");
+    }
+
+
+
 
     private bool IsFavorite(int id) => favorites.Contains(id);
-    private bool IsTopFavorite(int id) => topfavorite == id;
+    private bool IsTopFavorite(int id) => topFavorite == id;
+
 
     private string GetButtonClass(int id)
         => IsTopFavorite(id) ? "topfavorite"
@@ -153,6 +198,7 @@
 
     private void ClickButton(int id)
     {
+        if (!VotingConfig.IsVotingOpen()) return;
         if (IsTopFavorite(id)) return;
 
         if (IsFavorite(id))
@@ -168,55 +214,108 @@
 
     private void DoubleClickButton(int id)
     {
+        if (!VotingConfig.IsVotingOpen()) return;
         if (IsTopFavorite(id))
         {
-            topfavorite = null;
+            topFavorite = null;
             return;
         }
 
-        topfavorite = id;
+        topFavorite = id;
         favorites.Remove(id);
     }
 
-    private bool showAdmin = false;
-    private string adminCode = string.Empty;
 
-    private void ToggleAdmin() => showAdmin = !showAdmin;
-
-    private void OnLogin()
+    private async Task Btn_BewertungAbsenden()
     {
-        Console.WriteLine($"Login mit Code: {adminCode}");
+        hasSubmitted = true;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender)
-            return;
-
-        var uri = MyNavMgr.ToAbsoluteUri(MyNavMgr.Uri);
-
-        // 🔹 1. Token aus Query lesen
-        if (Microsoft.AspNetCore.WebUtilities.QueryHelpers
-            .ParseQuery(uri.Query)
-            .TryGetValue("token", out var tokenValue))
+        if (!VotingConfig.IsVotingOpen())
         {
-            // Token muss noch mitgegeben werden
-            MyNavMgr.NavigateTo($"/qr-login?token={tokenValue}");
+            status = Status.VotingClosed;
             return;
         }
 
-        // 🔹 2. Normaler Auth-Check
         var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
-        var user = state.User;
+        var username = state.User.Identity?.Name;
 
-        if (!user.Identity.IsAuthenticated)
+        if (!string.IsNullOrEmpty(username))
         {
-            MyNavMgr.NavigateTo("/adminlogin", true);
+            isAllowedToVote = TokenService.IsUserAllowedToVote(username);
         }
+        else
+        {
+            return;
+        }
+
+        if (!isAllowedToVote)
+        {
+            status = Status.AlreadyVoted;
+            return;
+        }
+
+
+        if (favorites.Count < 1 && topFavorite == null)
+        {
+            status = Status.NothingSelected;
+            return;
+        }
+        success = DaService.SendVote(favorites, topFavorite);
+        if (success)
+        {
+            status = Status.Success;
+            TokenService.MarkAsVoted(username);
+            favorites.Clear();
+            topFavorite = null;
+        }
+        else
+        {
+            status = Status.OtherError;
+        }
+
     }
 
-    private void Logout()
+
+    private bool showLongPressTitle = false;
+    private string longPressTitle = "";
+    private CancellationTokenSource? longPressCts;
+
+    private void OnPressStart(string title)
     {
-        ((MyCustomAuthStateProvider)MyAuthStateProvider).Logout();
-        MyNavMgr.NavigateTo("/");
+        // wenn Voting zu: optional trotzdem anzeigen oder return
+        // if (!VotingConfig.IsVotingOpen()) return;
+
+        longPressCts?.Cancel();
+        longPressCts = new CancellationTokenSource();
+        var token = longPressCts.Token;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(600, token); // Longpress-Dauer
+                longPressTitle = title;
+                showLongPressTitle = true;
+                await InvokeAsync(StateHasChanged);
+            }
+            catch (TaskCanceledException) { }
+        });
+    }
+
+    private void OnPressEnd()
+    {
+        longPressCts?.Cancel();
+        showLongPressTitle = false;
+    }
+
+
+
+    enum Status
+    {
+        Success,
+        AlreadyVoted,
+        NothingSelected,
+        VotingClosed,
+        OtherError
     }
 }
