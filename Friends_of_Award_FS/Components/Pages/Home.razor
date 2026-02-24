@@ -11,6 +11,7 @@
 @inject DiplomarbeitenService DaService
 @inject TokenService TokenService
 @inject VotingConfigService VotingConfig
+@inject IJSRuntime JS
 
 <PageTitle>Home</PageTitle>
 
@@ -228,6 +229,8 @@
 
     private async Task Btn_BewertungAbsenden()
     {
+
+
         hasSubmitted = true;
 
         if (!VotingConfig.IsVotingOpen())
@@ -260,6 +263,10 @@
             status = Status.NothingSelected;
             return;
         }
+        var ok = await JS.InvokeAsync<bool>("confirm", "Möchten Sie Ihre Bewertung wirklich absenden?");
+        if (!ok)
+            return;
+
         success = DaService.SendVote(favorites, topFavorite);
         if (success)
         {
@@ -282,9 +289,6 @@
 
     private void OnPressStart(string title)
     {
-        // wenn Voting zu: optional trotzdem anzeigen oder return
-        // if (!VotingConfig.IsVotingOpen()) return;
-
         longPressCts?.Cancel();
         longPressCts = new CancellationTokenSource();
         var token = longPressCts.Token;
