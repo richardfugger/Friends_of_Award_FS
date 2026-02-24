@@ -21,7 +21,7 @@ namespace Friends_of_Award_FS_Lib.Models
 
             try
             {
-                string sql = $"SELECT email, password FROM foaadmins";
+                string sql = $"SELECT email, password FROM foa_admins";
                 dt = wrappr.RunQuery(sql);
                 foreach (DataRow dr in dt.Rows)
                 {

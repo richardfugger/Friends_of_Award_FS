@@ -16,6 +16,7 @@ builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
   provider.GetRequiredService<MyCustomAuthStateProvider>());
 builder.Services.AddScoped<DiplomarbeitenService>();
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddSingleton<VotingConfigService>();
 
 
 var app = builder.Build();

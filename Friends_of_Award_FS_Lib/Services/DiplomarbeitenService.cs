@@ -49,7 +49,7 @@ namespace Friends_of_Award_FS_Lib.Services
         }
 
         private static readonly HashSet<string> AllowedAbteilungen =
-new(StringComparer.OrdinalIgnoreCase)
+            new(StringComparer.OrdinalIgnoreCase)
 { "MB", "ME", "WII", "WIE", "GT" };
 
         public (int imported, List<string> errors) ImportAndReplace(Stream excelStream)

@@ -10,6 +10,7 @@
 @inject NavigationManager MyNavMgr
 @inject DiplomarbeitenService DaService
 @inject TokenService TokenService
+@inject VotingConfigService VotingConfig
 
 <PageTitle>Home</PageTitle>
 
@@ -17,73 +18,93 @@
 <AuthorizeView>
     <Authorized>
         <div class="page-wrapper">
-        <h1 class="title-main">Friends of Award</h1>
+            <h1 class="title-main">Friends of Award</h1>
 
-        <p class="subtitle">
-            Geben Sie uns Ihre persönlichen Favoriten bekannt!
-        </p>
+            <p class="subtitle">
+                Geben Sie uns Ihre persönlichen Favoriten bekannt!
+            </p>
 
-        <p class="instructions">
-            Einfacher Klick = Favorit (max. 5)<br />
-            Doppelklick = Topfavorit (max. 1)
-        </p>
+            <p class="instructions">
+                Einfacher Klick = Favorit (max. 5)<br />
+                Doppelklick = Topfavorit (max. 1)
+            </p>
 
-        <p class="note-text">
-            Diese Abstimmung ist anonym und auf ein Gerät beschränkt!
-        </p>
+            <p class="note-text">
+                Diese Abstimmung ist anonym und auf ein Gerät beschränkt!
+            </p>
 
-        <div class="button-grid">
-            @foreach ((int nr, string titel) in diplomarbeiten)
+            <div class="button-grid">
+                @foreach ((int nr, string titel) in diplomarbeiten)
+                {
+                    <button class="number-button @(GetButtonClass(nr)) lp-target"
+                            title="@titel"
+                            @onpointerdown="() => OnPressStart(titel)"
+                            @onpointerup="OnPressEnd"
+                            @onpointercancel="OnPressEnd"
+                            @onpointerleave="OnPressEnd"
+                            @onclick="() => ClickButton(nr)"
+                            @ondblclick="() => DoubleClickButton(nr)"
+                            disabled="@(!VotingConfig.IsVotingOpen())">
+                        @GetStars(nr) @nr
+                    </button>
+                }
+            </div>
+            @if (showLongPressTitle)
             {
-                <button class="number-button @(GetButtonClass(nr))"
-                        title="@titel"
-                        @onclick="() => ClickButton(nr)"
-                        @ondblclick="() => DoubleClickButton(nr)">
-                    @GetStars(nr) @nr
+                <div class="lp-tooltip">@longPressTitle</div>
+            }
+
+            <p class="status">
+                Offen: @remainingFavorites Favoriten, @remainingTopFavorite Topfavorit
+            </p>
+
+            <div class="submit-container">
+                <button class="submit-button" @onclick="Btn_BewertungAbsenden" disabled="@(!VotingConfig.IsVotingOpen())">
+                    Bewertung absenden
                 </button>
-            }
-        </div>
-
-        <p class="status">
-            Offen: @remainingFavorites Favoriten, @remainingTopFavorite Topfavorit
-        </p>
-
-        <div class="submit-container">
-            <button class="submit-button" @onclick="Btn_BewertungAbsenden">
-                Bewertung absenden
-            </button>
-        </div>
-
-
-        @if (hasSubmitted)
-        {
-            @switch (status)
+            </div>
+            @if (!VotingConfig.IsVotingOpen())
             {
-                case Status.Success:
-                    <p class="success-text">
-                        ✅ Vielen Dank! Ihre Bewertung wurde gespeichert.
-                    </p>
-                    break;
-
-                case Status.AlreadyVoted:
-                    <p class="error-text">
-                        ⚠️ Sie haben bereits abgestimmt. Mehrfaches Abstimmen ist nicht erlaubt.
-                    </p>
-                    break;
-
-                case Status.NothingSelected:
-                    <p class="error-text">
-                        ⚠️ Bitte wählen Sie mindestens einen Favoriten oder einen Topfavoriten aus.
-                    </p>
-                    break;
-
-                case Status.OtherError:
-                    <p class="error-text">
-                        ❌ Fehler beim Speichern der Bewertung.
-                    </p>
-                    break;
+                <p class="error-text">
+                    ⛔ Die Abstimmung ist bereits beendet.
+                </p>
             }
-        }
+
+            @if (hasSubmitted)
+            {
+                @switch (status)
+                {
+                    case Status.Success:
+                        <p class="success-text">
+                            ✅ Vielen Dank! Ihre Bewertung wurde gespeichert.
+                        </p>
+                        break;
+
+                    case Status.AlreadyVoted:
+                        <p class="error-text">
+                            ⚠️ Sie haben bereits abgestimmt. Mehrfaches Abstimmen ist nicht erlaubt.
+                        </p>
+                        break;
+
+                    case Status.NothingSelected:
+                        <p class="error-text">
+                            ⚠️ Bitte wählen Sie mindestens einen Favoriten oder einen Topfavoriten aus.
+                        </p>
+                        break;
+
+                    case Status.VotingClosed:
+                        <p class="error-text">
+                            ⛔ Die Abstimmung ist bereits beendet.
+                        </p>
+                        break;
+
+                    case Status.OtherError:
+                        <p class="error-text">
+                            ❌ Fehler beim Speichern der Bewertung.
+                        </p>
+                        break;
+                }
+            }
         </div>
 
     </Authorized>
@@ -93,59 +114,6 @@
     </NotAuthorized>
 </AuthorizeView>
 
-@*
-<h3>Willkommen</h3>
-
-<h1 class="title-main">Friends of Award</h1>
-
-<p class="subtitle">
-    Geben Sie uns Ihre persönlichen Favoriten bekannt!
-</p>
-
-<p class="instructions">
-    Einfacher Klick = Favorit (max. 5)<br />
-    Doppelklick = Topfavorit (max. 1)
-</p>
-
-<p class="note-text">
-    Diese Abstimmung ist anonym und auf ein Gerät beschränkt!
-</p>
-
-<div class="button-grid">
-    @foreach ((int nr, string titel) in diplomarbeiten)
-    {
-        <button class="number-button @(GetButtonClass(nr))"
-                title="@titel"
-                @onclick="() => ClickButton(nr)"
-                @ondblclick="() => DoubleClickButton(nr)">
-            @GetStars(nr) @nr
-        </button>
-    }
-</div>
-
-<p class="status">
-    Offen: @remainingFavorites Favoriten, @remainingTopFavorite Topfavorit
-</p>
-
-<div class="submit-container">
-    <button class="submit-button" @onclick="Btn_BewertungAbsenden">
-        Bewertung absenden
-    </button>
-</div>
-
-
-@if (hasSubmitted)
-{
-    if (success)
-    {
-        <p class="success-text">✅ Vielen Dank! Ihre Bewertung wurde gespeichert.</p>
-    }
-    else if (!success)
-    {
-        <p class="error-text">❌ Fehler beim Speichern der Bewertung.</p>
-    }
-}
-*@
 
 @code {
     private List<(int, string)> diplomarbeiten = new();
@@ -161,6 +129,7 @@
     private Status status;
     private bool hasSubmitted = false;
     private bool isAllowedToVote = false;
+    private bool isVotingOpen;
 
 
 
@@ -168,6 +137,7 @@
     protected override void OnInitialized()
     {
         diplomarbeiten = LoadDiplomarbeiten();
+        isVotingOpen = VotingConfig.IsVotingOpen();
     }
 
     private List<(int, string)> LoadDiplomarbeiten()
@@ -228,6 +198,7 @@
 
     private void ClickButton(int id)
     {
+        if (!VotingConfig.IsVotingOpen()) return;
         if (IsTopFavorite(id)) return;
 
         if (IsFavorite(id))
@@ -243,6 +214,7 @@
 
     private void DoubleClickButton(int id)
     {
+        if (!VotingConfig.IsVotingOpen()) return;
         if (IsTopFavorite(id))
         {
             topFavorite = null;
@@ -257,6 +229,13 @@
     private async Task Btn_BewertungAbsenden()
     {
         hasSubmitted = true;
+
+        if (!VotingConfig.IsVotingOpen())
+        {
+            status = Status.VotingClosed;
+            return;
+        }
+
         var state = await MyAuthStateProvider.GetAuthenticationStateAsync();
         var username = state.User.Identity?.Name;
 
@@ -269,7 +248,7 @@
             return;
         }
 
-        if(!isAllowedToVote)
+        if (!isAllowedToVote)
         {
             status = Status.AlreadyVoted;
             return;
@@ -297,11 +276,46 @@
     }
 
 
+    private bool showLongPressTitle = false;
+    private string longPressTitle = "";
+    private CancellationTokenSource? longPressCts;
+
+    private void OnPressStart(string title)
+    {
+        // wenn Voting zu: optional trotzdem anzeigen oder return
+        // if (!VotingConfig.IsVotingOpen()) return;
+
+        longPressCts?.Cancel();
+        longPressCts = new CancellationTokenSource();
+        var token = longPressCts.Token;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(600, token); // Longpress-Dauer
+                longPressTitle = title;
+                showLongPressTitle = true;
+                await InvokeAsync(StateHasChanged);
+            }
+            catch (TaskCanceledException) { }
+        });
+    }
+
+    private void OnPressEnd()
+    {
+        longPressCts?.Cancel();
+        showLongPressTitle = false;
+    }
+
+
+
     enum Status
     {
         Success,
         AlreadyVoted,
         NothingSelected,
+        VotingClosed,
         OtherError
     }
 }

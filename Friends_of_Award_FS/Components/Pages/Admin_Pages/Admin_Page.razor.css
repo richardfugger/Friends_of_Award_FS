@@ -124,20 +124,29 @@ tbody tr:nth-child(even) {
         color: #991b1b;
     }
 
-/* Reload Button */
-.btn-reload {
-    margin-top: 1rem;
-    padding: 0.6rem 1.2rem;
-    border: none;
-    border-radius: 8px;
-    background: #2563eb;
-    color: white;
-    cursor: pointer;
-    font-weight: 600;
+/* Großer Reload Button unterhalb */
+.reload-container {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
 }
 
-    .btn-reload:hover {
-        background: #1d4ed8;
+.btn-reload-large {
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(37,99,235,0.3);
+    transition: all 0.2s ease;
+}
+
+    .btn-reload-large:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(37,99,235,0.4);
     }
 
 /* Responsive */
