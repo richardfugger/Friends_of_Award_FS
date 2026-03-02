@@ -4,9 +4,12 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject MyCustomAuthStateProvider? MyAuthStateProvider
 @inject NavigationManager MyNavMgr
+@using MySql.Data.MySqlClient;
+@using System.Data; // wichtig für DataTable/DataRow
 
 <PageTitle>Home</PageTitle>
 
+@*
 <AuthorizeView>
     <Authorized>
         <h3>Willkommen</h3>
@@ -16,7 +19,7 @@
         <p>Weiterleitung...</p>
     </NotAuthorized>
 </AuthorizeView>
-
+*@
 <h1 class="title-main">Friends of Award</h1>
 
 <p class="subtitle">
@@ -54,21 +57,6 @@
     </button>
 </div>
 
-@*if (showAdmin)
-{
-    <div class="admin-panel">
-        <h2 class="admin-title">Adminbereich</h2>
-
-        <div class="admin-row">
-            <label for="adminCode">Admin-Code:</label>
-            <input id="adminCode" type="password" @bind="adminCode" />
-
-            <button @onclick="OnLogin">Anmelden</button>
-            <button @onclick="OnLogout">Abmelden</button>
-        </div>
-    </div>
-}*@
-
 <button class="home-button" @onclick="ToggleAdmin">
     🏠
 </button>
@@ -93,34 +81,32 @@
         public string Titel { get; set; } = string.Empty;
     }
 
-    private List<string> Diplomarbeitstitel = new()
+   
+    private List<string> Diplomarbeitstitel = new();
+
+    private void LadeDiplomarbeiten()
     {
-        "Smart Home Monitoring System",
-        "KI-gestützte Bildauswertung",
-        "Mobile App für Schulorganisation",
-        "IoT Energieverbrauchsanalyse",
-        "Webplattform Event-Management",
-        "Autonomes Robotikfahrzeug",
-        "E-Learning Portal",
-        "3D-Drucker Monitoring",
-        "Smart Garden",
-        "Chatbot Schul-FAQ",
-        "RFID Zeiterfassung",
-        "VR Physik Lernapp",
-        "Coding Lernplattform",
-        "Ticket-System Schule",
-        "Smart Locker System",
-        "Verkehrsanalyse KI",
-        "Fitness Tracker BLE",
-        "Online-Abstimmungssystem",
-        "Raumbelegungsanzeige"
-    };
+        Diplomarbeitstitel.Clear();
+
+        DbWrapperMySqlV2 wrp = DbWrapperMySqlV2.Wrapper;
+
+        DataTable dt = wrp.RunQuery("SELECT titel FROM diplomarbeiten ORDER BY id;");
+
+        foreach (DataRow row in dt.Rows)
+        {
+            Diplomarbeitstitel.Add(row["titel"]?.ToString() ?? "");
+        }
+    }
 
     public List<DiplomarbeitInfo> Diplomarbeiten { get; set; } = new();
 
     protected override void OnInitialized()
     {
+        LadeDiplomarbeiten(); // <-- DAS ist wichtig
+
+        Diplomarbeiten.Clear();
         int idCounter = 1;
+
         foreach (var titel in Diplomarbeitstitel)
         {
             Diplomarbeiten.Add(new DiplomarbeitInfo
@@ -130,6 +116,13 @@
             });
         }
     }
+
+
+
+
+
+
+
 
     private int MaxFavorites = 5;
     private HashSet<int> favorites = new();
@@ -188,7 +181,7 @@
         Console.WriteLine($"Login mit Code: {adminCode}");
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    @*protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
             return;
@@ -214,6 +207,7 @@
             MyNavMgr.NavigateTo("/adminlogin", true);
         }
     }
+    *@
 
     private void Logout()
     {

@@ -1,0 +1,90 @@
+﻿
+@page "/bestaetigung"
+
+<div class="confirmation-container">
+    <div class="confirmation-card">
+        <div class="icon">✅</div>
+
+        <h1>Bewertung erfolgreich abgegeben!</h1>
+
+        <p class="text">
+            Vielen Dank für deine Teilnahme an der<br />
+            <strong>Friends of Award Abstimmung</strong>.
+        </p>
+
+        <p class="subtext">
+            Deine Stimmen wurden anonym gespeichert.
+        </p>
+
+        <button class="home-button" @onclick="GoHome">
+            Zurück zur Startseite
+        </button>
+    </div>
+</div>
+
+@code {
+    [Inject] NavigationManager Nav { get; set; } = default!;
+
+    void GoHome()
+    {
+        Nav.NavigateTo("/");
+    }
+}
+
+
+<style>
+    .confirmation-container {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #1e1e2f, #2b2b45);
+        font-family: Arial, sans-serif;
+    }
+
+    .confirmation-card {
+        background: white;
+        padding: 40px 50px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+        max-width: 420px;
+    }
+
+    .icon {
+        font-size: 64px;
+        margin-bottom: 20px;
+    }
+
+    .confirmation-card h1 {
+        margin-bottom: 15px;
+        color: #2b2b45;
+    }
+
+    .text {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .subtext {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    .home-button {
+        padding: 12px 28px;
+        font-size: 16px;
+        border: none;
+        border-radius: 25px;
+        background: #4CAF50;
+        color: white;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+        .home-button:hover {
+            background: #43a047;
+            transform: scale(1.05);
+        }
+</style>
